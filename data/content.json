@@ -1,0 +1,70 @@
+{
+  "about": {
+    "name": "Muhamed Ahmed Shifaw",
+    "title": "Software Developer | Full-Stack Developer | Computer Science Graduate",
+    "bio": "Building innovative, secure, and user-focused software solutions. I hold a BSc in Computer Science and a Bachelor of Management, combining technical depth with business perspective. I'm passionate about solving problems through clean code and collaborative development.",
+    "location": "Gondar, Ethiopia"
+  },
+  "contact": {
+    "email": "994muhamedahmed@gmail.com",
+    "phone": "+251 909 041 680",
+    "github": "github.com/muha-1680",
+    "linkedin": "linkedin.com/in/muhamed-ahmed"
+  },
+  "skills": [
+    "JavaScript",
+    "Python",
+    "Java",
+    "React",
+    "Node.js",
+    "PHP",
+    "MySQL",
+    "AWS"
+  ],
+  "colors": {
+    "primary": "#2563eb",
+    "bg": "#f0f2f5"
+  },
+  "projects": [
+    {
+      "title": "Household Services Management System",
+      "desc": "University final-year group project. A web-based platform connecting households with service providers, enabling users to request, schedule, and manage services through a centralized system.",
+      "role": "Frontend Developer",
+      "tech": ["HTML5", "CSS3", "Bootstrap", "JavaScript", "PHP", "MySQL"]
+    },
+    {
+      "title": "Hotel Management System",
+      "desc": "A comprehensive hotel management application to simplify room reservations, customer registration, check-in/check-out processes, and administrative management with reporting features.",
+      "role": "Full-Stack Developer",
+      "tech": ["HTML", "CSS", "Bootstrap", "JavaScript", "PHP", "MySQL"]
+    },
+    {
+      "title": "Distributed Chat System",
+      "desc": "A distributed communication application using networking concepts that allows users to exchange messages across multiple clients in real-time using client-server architecture.",
+      "role": "Backend Developer",
+      "tech": ["Java", "Socket Programming", "Networking", "Client-Server", "Multi-threading"]
+    },
+    {
+      "title": "Network Infrastructure Simulation",
+      "desc": "Designed and simulated a complete enterprise network using Cisco Packet Tracer, including VLANs, routing protocols, DHCP, DNS, and security configurations.",
+      "role": "Network Designer",
+      "tech": ["Cisco Packet Tracer", "VLAN", "OSPF", "DHCP", "DNS", "Network Security"]
+    }
+  ],
+  "experiences": [
+    {
+      "title": "IT Intern — Networking & Maintenance",
+      "company": "Commercial Bank of Ethiopia",
+      "location": "Addis Ababa, Ethiopia",
+      "date": "October 2025 – December 2025",
+      "responsibilities": [
+        "Assisted in maintaining computer systems and network infrastructure for a major financial institution.",
+        "Supported LAN configuration, routing, and switching under supervision of senior network engineers.",
+        "Installed and updated operating systems and software applications across multiple departments.",
+        "Diagnosed hardware and software issues; performed preventive maintenance to improve system reliability.",
+        "Collaborated with IT staff to ensure secure and efficient banking operations.",
+        "Followed organizational security procedures and best practices for data protection."
+      ]
+    }
+  ]
+}
