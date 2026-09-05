@@ -68,7 +68,7 @@ export default async function ContactPage() {
         </a>
 
         <a
-          href="https://twitter.com/MUHAMED_SHIFAW"
+          href="https://twitter.com/@muhamed83085"
           target="_blank"
           rel="noopener noreferrer"
           className="contact-card"
@@ -78,7 +78,7 @@ export default async function ContactPage() {
           </div>
           <div className="contact-info">
             <div className="label">Twitter / X</div>
-            <div className="value">@MUHAMED_SHIFAW</div>
+            <div className="value">@muhamed83085</div>
           </div>
         </a>
 
