@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel · Muhamed Ahmed</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .admin-wrapper {
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            padding: 40px;
+        }
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e8ecf1;
+        }
+        .admin-header h1 {
+            font-size: 1.8rem;
+        }
+        .admin-header h1 i {
+            color: #2563eb;
+        }
+        .admin-header .logout-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        .admin-header .logout-btn:hover {
+            background: #b91c1c;
+        }
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .login-form h2 {
+            margin-bottom: 20px;
+        }
+        .login-form input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 2px solid #e8ecf1;
+            border-radius: 12px;
+            font-size: 1rem;
+            margin-bottom: 16px;
+        }
+        .login-form button {
+            width: 100%;
+            padding: 14px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .login-form button:hover {
+            background: #1d4ed8;
+        }
+        .login-error {
+            color: #dc2626;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* Admin Dashboard */
+        .admin-dashboard {
+            display: none;
+        }
+        .admin-dashboard.active {
+            display: block;
+        }
+
+        .section-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .section-card {
+            background: #f8faff;
+            border: 1px solid #e8ecf1;
+            border-radius: 16px;
+            padding: 24px;
+        }
+        .section-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            font-size: 1.1rem;
+        }
+        .section-card h3 i {
+            color: #2563eb;
+        }
+        .section-card label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 4px;
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+        .section-card input,
+        .section-card textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            font-family: inherit;
+        }
+        .section-card textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .section-card .save-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        .section-card .save-btn:hover {
+            background: #1d4ed8;
+        }
+        .section-card .save-btn.success {
+            background: #16a34a;
+        }
+
+        .project-item {
+            background: white;
+            border: 1px solid #e8ecf1;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        .project-item input,
+        .project-item textarea {
+            margin-bottom: 8px;
+        }
+        .project-item .delete-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .project-item .delete-btn:hover {
+            background: #b91c1c;
+        }
+        .add-project-btn {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            width: 100%;
+            margin-top: 8px;
+        }
+        .add-project-btn:hover {
+            background: #16a34a;
+        }
+
+        .chip {
+            background: #eef2ff;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #1e293b;
+            display: inline-block;
+            margin: 2px;
+        }
+
+        @media (max-width: 700px) {
+            .section-grid {
+                grid-template-columns: 1fr;
+            }
+            .admin-wrapper {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-wrapper">
+        <!-- LOGIN FORM -->
+        <div class="login-form" id="loginForm">
+            <h2><i class="fas fa-lock" style="color:#2563eb;"></i> Admin Login</h2>
+            <p style="color:#6b7280; margin-bottom:20px;">Enter your password to manage your portfolio</p>
+            <input type="password" id="passwordInput" placeholder="Enter password..." />
+            <button onclick="login()">Login</button>
+            <div class="login-error" id="loginError">❌ Wrong password. Try again.</div>
+        </div>
+
+        <!-- ADMIN DASHBOARD -->
+        <div class="admin-dashboard" id="adminDashboard">
+            <div class="admin-header">
+                <h1><i class="fas fa-cog"></i> Portfolio Admin</h1>
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+
+            <div class="section-grid">
+
+                <!-- === ABOUT SECTION === -->
+                <div class="section-card">
+                    <h3><i class="fas fa-user"></i> About Me</h3>
+                    <label>Your Name</label>
+                    <input type="text" id="aboutName" value="Muhamed Ahmed Shifaw" />
+                    <label>Title</label>
+                    <input type="text" id="aboutTitle" value="Software Developer | Full-Stack Developer" />
+                    <label>Bio</label>
+                    <textarea id="aboutBio">Building innovative, secure, and user-focused software solutions. I hold a BSc in Computer Science and a Bachelor of Management, combining technical depth with business perspective.</textarea>
+                    <label>Location</label>
+                    <input type="text" id="aboutLocation" value="Gondar, Ethiopia" />
+                    <button class="save-btn" onclick="saveAbout()"><i class="fas fa-save"></i> Save About</button>
+                </div>
+
+                <!-- === EXPERIENCE SECTION === -->
+                <div class="section-card">
+                    <h3><i class="fas fa-briefcase"></i> Experience</h3>
+                    <div id="experienceList">
+                        <!-- Will be populated from localStorage -->
+                    </div>
+                    <button class="add-project-btn" onclick="addExperience()"><i class="fas fa-plus"></i> Add Experience</button>
+                </div>
+
+                <!-- === PROJECTS SECTION === -->
+                <div class="section-card">
+                    <h3><i class="fas fa-code"></i> Projects</h3>
+                    <div id="projectList">
+                        <!-- Will be populated from localStorage -->
+                    </div>
+                    <button class="add-project-btn" onclick="addProject()"><i class="fas fa-plus"></i> Add Project</button>
+                </div>
+
+                <!-- === SKILLS SECTION === -->
+                <div class="section-card">
+                    <h3><i class="fas fa-cog"></i> Skills</h3>
+                    <label>Skills (comma separated)</label>
+                    <input type="text" id="skillsInput" placeholder="React, Node.js, Python, ..." />
+                    <button class="save-btn" onclick="saveSkills()"><i class="fas fa-save"></i> Save Skills</button>
+                    <div style="margin-top:12px;" id="skillsPreview"></div>
+                </div>
+
+                <!-- === COLORS SECTION === -->
+                <div class="section-card">
+                    <h3><i class="fas fa-palette"></i> Colors</h3>
+                    <label>Primary Color</label>
+                    <input type="color" id="primaryColor" value="#2563eb" />
+                    <label>Background Color</label>
+                    <input type="color" id="bgColor" value="#f0f2f5" />
+                    <button class="save-btn" onclick="saveColors()"><i class="fas fa-save"></i> Apply Colors</button>
+                </div>
+
+                <!-- === CONTACT SECTION === -->
+                <div class="section-card">
+                    <h3><i class="fas fa-envelope"></i> Contact</h3>
+                    <label>Email</label>
+                    <input type="text" id="contactEmail" value="994muhamedahmed@gmail.com" />
+                    <label>Phone</label>
+                    <input type="text" id="contactPhone" value="+251 909 041 680" />
+                    <label>GitHub</label>
+                    <input type="text" id="contactGithub" value="github.com/muha-1680" />
+                    <label>LinkedIn</label>
+                    <input type="text" id="contactLinkedin" value="linkedin.com/in/muhamed-ahmed" />
+                    <button class="save-btn" onclick="saveContact()"><i class="fas fa-save"></i> Save Contact</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // ADMIN LOGIN
+        // ============================================
+        const ADMIN_PASSWORD = "admin123"; // Change this!
+
+        function login() {
+            const password = document.getElementById('passwordInput').value;
+            if (password === ADMIN_PASSWORD) {
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('adminDashboard').classList.add('active');
+                loadAllData();
+            } else {
+                document.getElementById('loginError').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('loginError').style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        function logout() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('adminDashboard').classList.remove('active');
+            document.getElementById('passwordInput').value = '';
+        }
+
+        // Enter key to login
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') login();
+        });
+
+        // ============================================
+        // DATA MANAGEMENT (localStorage)
+        // ============================================
+
+        // Default data
+        const defaultProjects = [
+            { title: 'Household Services', desc: 'Web platform connecting households with service providers. Booking & scheduling system.', role: 'Frontend Developer', tech: ['HTML', 'CSS', 'Bootstrap', 'JavaScript', 'PHP', 'MySQL'] },
+            { title: 'Hotel Management', desc: 'Room reservations, customer registration, check-in/out, admin dashboard & reports.', role: 'Full-Stack Developer', tech: ['HTML', 'CSS', 'Bootstrap', 'JavaScript', 'PHP', 'MySQL'] },
+            { title: 'Distributed Chat System', desc: 'Multi-client messaging using Java socket programming & client-server architecture.', role: 'Backend Developer', tech: ['Java', 'Socket Programming', 'Networking'] }
+        ];
+
+        const defaultExperiences = [
+            { title: 'IT Intern — Networking & Maintenance', company: 'Commercial Bank of Ethiopia', date: 'Oct 2025 – Dec 2025', responsibilities: ['Assisted in maintaining computer systems', 'Configured LAN connectivity', 'Supported router/switch configuration', 'Installed and updated OS', 'Diagnosed hardware issues'] }
+        ];
+
+        function loadAllData() {
+            loadProjects();
+            loadExperiences();
+            loadAbout();
+            loadSkills();
+            loadColors();
+            loadContact();
+        }
+
+        // ============================================
+        // PROJECTS
+        // ============================================
+        function getProjects() {
+            const data = localStorage.getItem('portfolio_projects');
+            return data ? JSON.parse(data) : defaultProjects;
+        }
+
+        function saveProjects(projects) {
+            localStorage.setItem('portfolio_projects', JSON.stringify(projects));
+            loadProjects();
+        }
+
+        function loadProjects() {
+            const projects = getProjects();
+            const container = document.getElementById('projectList');
+            container.innerHTML = '';
+            projects.forEach((project, index) => {
+                const div = document.createElement('div');
+                div.className = 'project-item';
+                div.innerHTML = `
+                    <input type="text" value="${project.title}" placeholder="Project Title" data-index="${index}" data-field="title" />
+                    <textarea placeholder="Description" data-index="${index}" data-field="desc">${project.desc}</textarea>
+                    <input type="text" value="${project.role}" placeholder="Your Role" data-index="${index}" data-field="role" />
+                    <input type="text" value="${project.tech.join(', ')}" placeholder="Technologies (comma separated)" data-index="${index}" data-field="tech" />
+                    <button class="delete-btn" onclick="deleteProject(${index})"><i class="fas fa-trash"></i> Delete</button>
+                `;
+                container.appendChild(div);
+            });
+
+            // Auto-save on change
+            document.querySelectorAll('#projectList input, #projectList textarea').forEach(el => {
+                el.addEventListener('change', function() {
+                    const index = parseInt(this.dataset.index);
+                    const field = this.dataset.field;
+                    const projects = getProjects();
+                    if (field === 'tech') {
+                        projects[index][field] = this.value.split(',').map(s => s.trim()).filter(s => s);
+                    } else {
+                        projects[index][field] = this.value;
+                    }
+                    saveProjects(projects);
+                });
+            });
+        }
+
+        function addProject() {
+            const projects = getProjects();
+            projects.push({ title: 'New Project', desc: 'Description', role: 'Developer', tech: ['HTML', 'CSS'] });
+            saveProjects(projects);
+        }
+
+        function deleteProject(index) {
+            let projects = getProjects();
+            projects.splice(index, 1);
+            saveProjects(projects);
+        }
+
+        // ============================================
+        // EXPERIENCE
+        // ============================================
+        function getExperiences() {
+            const data = localStorage.getItem('portfolio_experiences');
+            return data ? JSON.parse(data) : defaultExperiences;
+        }
+
+        function saveExperiences(experiences) {
+            localStorage.setItem('portfolio_experiences', JSON.stringify(experiences));
+            loadExperiences();
+        }
+
+        function loadExperiences() {
+            const experiences = getExperiences();
+            const container = document.getElementById('experienceList');
+            container.innerHTML = '';
+            experiences.forEach((exp, index) => {
+                const div = document.createElement('div');
+                div.className = 'project-item';
+                div.innerHTML = `
+                    <input type="text" value="${exp.title}" placeholder="Job Title" data-index="${index}" data-field="title" />
+                    <input type="text" value="${exp.company}" placeholder="Company" data-index="${index}" data-field="company" />
+                    <input type="text" value="${exp.date}" placeholder="Date" data-index="${index}" data-field="date" />
+                    <textarea placeholder="Responsibilities (one per line)" data-index="${index}" data-field="responsibilities">${exp.responsibilities.join('\n')}</textarea>
+                    <button class="delete-btn" onclick="deleteExperience(${index})"><i class="fas fa-trash"></i> Delete</button>
+                `;
+                container.appendChild(div);
+            });
+
+            document.querySelectorAll('#experienceList input, #experienceList textarea').forEach(el => {
+                el.addEventListener('change', function() {
+                    const index = parseInt(this.dataset.index);
+                    const field = this.dataset.field;
+                    const experiences = getExperiences();
+                    if (field === 'responsibilities') {
+                        experiences[index][field] = this.value.split('\n').filter(s => s.trim());
+                    } else {
+                        experiences[index][field] = this.value;
+                    }
+                    saveExperiences(experiences);
+                });
+            });
+        }
+
+        function addExperience() {
+            const experiences = getExperiences();
+            experiences.push({ title: 'New Job Title', company: 'Company Name', date: 'Month Year', responsibilities: ['Responsibility 1', 'Responsibility 2'] });
+            saveExperiences(experiences);
+        }
+
+        function deleteExperience(index) {
+            let experiences = getExperiences();
+            experiences.splice(index, 1);
+            saveExperiences(experiences);
+        }
+
+        // ============================================
+        // ABOUT
+        // ============================================
+        function loadAbout() {
+            const data = localStorage.getItem('portfolio_about');
+            if (data) {
+                const about = JSON.parse(data);
+                document.getElementById('aboutName').value = about.name || 'Muhamed Ahmed Shifaw';
+                document.getElementById('aboutTitle').value = about.title || 'Software Developer | Full-Stack Developer';
+                document.getElementById('aboutBio').value = about.bio || 'Building innovative...';
+                document.getElementById('aboutLocation').value = about.location || 'Gondar, Ethiopia';
+            }
+        }
+
+        function saveAbout() {
+            const about = {
+                name: document.getElementById('aboutName').value,
+                title: document.getElementById('aboutTitle').value,
+                bio: document.getElementById('aboutBio').value,
+                location: document.getElementById('aboutLocation').value
+            };
+            localStorage.setItem('portfolio_about', JSON.stringify(about));
+            const btn = event.target;
+            btn.textContent = '✅ Saved!';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-save"></i> Save About';
+            }, 2000);
+        }
+
+        // ============================================
+        // SKILLS
+        // ============================================
+        function loadSkills() {
+            const skills = localStorage.getItem('portfolio_skills');
+            if (skills) {
+                document.getElementById('skillsInput').value = skills;
+                updateSkillsPreview(skills);
+            } else {
+                document.getElementById('skillsInput').value = 'JavaScript, Python, Java, React, Node.js, PHP, MySQL, AWS';
+                updateSkillsPreview('JavaScript, Python, Java, React, Node.js, PHP, MySQL, AWS');
+            }
+        }
+
+        function saveSkills() {
+            const skills = document.getElementById('skillsInput').value;
+            localStorage.setItem('portfolio_skills', skills);
+            updateSkillsPreview(skills);
+            const btn = event.target;
+            btn.textContent = '✅ Saved!';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-save"></i> Save Skills';
+            }, 2000);
+        }
+
+        function updateSkillsPreview(skills) {
+            const container = document.getElementById('skillsPreview');
+            const items = skills.split(',').map(s => s.trim()).filter(s => s);
+            container.innerHTML = items.map(s => `<span class="chip">${s}</span>`).join('');
+        }
+
+        // ============================================
+        // COLORS
+        // ============================================
+        function loadColors() {
+            const colors = localStorage.getItem('portfolio_colors');
+            if (colors) {
+                const parsed = JSON.parse(colors);
+                document.getElementById('primaryColor').value = parsed.primary || '#2563eb';
+                document.getElementById('bgColor').value = parsed.bg || '#f0f2f5';
+                applyColors(parsed.primary, parsed.bg);
+            }
+        }
+
+        function saveColors() {
+            const primary = document.getElementById('primaryColor').value;
+            const bg = document.getElementById('bgColor').value;
+            localStorage.setItem('portfolio_colors', JSON.stringify({ primary, bg }));
+            applyColors(primary, bg);
+            const btn = event.target;
+            btn.textContent = '✅ Applied!';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-save"></i> Apply Colors';
+            }, 2000);
+        }
+
+        function applyColors(primary, bg) {
+            document.body.style.background = bg;
+            document.querySelectorAll('.section-card h3 i, .admin-header h1 i, .login-form h2 i').forEach(el => {
+                el.style.color = primary;
+            });
+            document.querySelectorAll('.save-btn, .login-form button, .add-project-btn').forEach(el => {
+                el.style.background = primary;
+            });
+        }
+
+        // ============================================
+        // CONTACT
+        // ============================================
+        function loadContact() {
+            const data = localStorage.getItem('portfolio_contact');
+            if (data) {
+                const contact = JSON.parse(data);
+                document.getElementById('contactEmail').value = contact.email || '994muhamedahmed@gmail.com';
+                document.getElementById('contactPhone').value = contact.phone || '+251 909 041 680';
+                document.getElementById('contactGithub').value = contact.github || 'github.com/muha-1680';
+                document.getElementById('contactLinkedin').value = contact.linkedin || 'linkedin.com/in/muhamed-ahmed';
+            }
+        }
+
+        function saveContact() {
+            const contact = {
+                email: document.getElementById('contactEmail').value,
+                phone: document.getElementById('contactPhone').value,
+                github: document.getElementById('contactGithub').value,
+                linkedin: document.getElementById('contactLinkedin').value
+            };
+            localStorage.setItem('portfolio_contact', JSON.stringify(contact));
+            const btn = event.target;
+            btn.textContent = '✅ Saved!';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-save"></i> Save Contact';
+            }, 2000);
+        }
+
+        // ============================================
+        // INIT - Check if already logged in
+        // ============================================
+        // Auto-login if session exists (optional)
+        // Just show login form by default
+    </script>
+
+</body>
+</html>
