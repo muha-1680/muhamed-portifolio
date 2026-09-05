@@ -53,7 +53,7 @@ export default async function ContactPage() {
         </a>
 
         <a
-          href={`https://www.${contact.linkedin}`}
+          href={`https://www.linkedin.com/in/muhamed-ahmed-37b945422`}
           target="_blank"
           rel="noopener noreferrer"
           className="contact-card"
