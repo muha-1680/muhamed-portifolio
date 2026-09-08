@@ -15,7 +15,6 @@
     "telegram": "@MUHAMED_SHIFAW"
   },
   "skills": [
-    "Full Stack Developer",
     "JavaScript",
     "Python",
     "Java",
@@ -103,11 +102,11 @@
     "stats": [
       {
         "label": "Years Experience",
-        "number": ""
+        "number": "3+"
       },
       {
         "label": "Projects Completed",
-        "number": "4"
+        "number": "8"
       },
       {
         "label": "Degrees",
@@ -115,7 +114,7 @@
       },
       {
         "label": "Technologies",
-        "number": "full "
+        "number": "5"
       }
     ],
     "profile": "I'm Muhamed Ahmed, a software development professional with a passion for helping companies achieve their growth potential. With degrees in Computer Science and Management, I have extensive experience in relationship building, and I strive to provide innovative solutions that drive success for my clients.",

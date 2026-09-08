@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import DarkModeBody from "./dark-mode-body";
 
 export const metadata: Metadata = {
   title: {
@@ -9,8 +10,6 @@ export const metadata: Metadata = {
   description:
     "Portfolio of Muhamed Ahmed Shifaw — Software Developer and Computer Science graduate. Explore my work, skills, and experience.",
 };
-
-const THEME_INIT_SCRIPT = `try{if(localStorage.getItem('darkMode')==='true'){document.body.classList.add('dark-mode');}}catch(e){}`;
 
 export default function RootLayout({
   children,
@@ -24,7 +23,7 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <DarkModeBody />
         {children}
       </body>
     </html>

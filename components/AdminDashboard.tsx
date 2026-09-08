@@ -37,7 +37,6 @@ export default function AdminDashboard() {
   }
 
   async function persist(next: Content) {
-    setContent(next);
     try {
       const res = await fetch("/api/content", {
         method: "PUT",
@@ -45,6 +44,9 @@ export default function AdminDashboard() {
         body: JSON.stringify(next),
       });
       if (!res.ok) throw new Error("Save failed");
+      // Re-fetch so the public site and admin both reflect the latest persisted state
+      const fresh = (await res.json()) as Content;
+      setContent(fresh);
       showFlash("Saved successfully ✓");
     } catch {
       showFlash("Failed to save — please try again.", "error");
@@ -296,18 +298,14 @@ export default function AdminDashboard() {
                           input.files[0],
                         );
                         if (!url) return;
-                        setContent((prev) =>
-                          prev
-                            ? {
-                                ...prev,
-                                about: {
-                                  ...prev.about,
-                                  profilePhoto: url,
-                                },
-                              }
-                            : prev,
-                        );
-                        showFlash("Photo uploaded & saved ✓");
+                        // Persist the blob URL to the content store immediately
+                        persist({
+                          ...content,
+                          about: {
+                            ...content.about,
+                            profilePhoto: url,
+                          },
+                        });
                       } catch (err) {
                         showFlash(
                           (err as Error).message,
@@ -499,6 +497,15 @@ export default function AdminDashboard() {
           >
             <i className="fas fa-plus"></i> Add Experience
           </button>
+
+          <button
+            className="save-btn"
+            onClick={() => {
+              persist(content);
+            }}
+          >
+            <i className="fas fa-save"></i> Save Experience
+          </button>
         </div>
 
         {/* ===================== PROJECTS ===================== */}
@@ -594,6 +601,15 @@ export default function AdminDashboard() {
             }}
           >
             <i className="fas fa-plus"></i> Add Project
+          </button>
+
+          <button
+            className="save-btn"
+            onClick={() => {
+              persist(content);
+            }}
+          >
+            <i className="fas fa-save"></i> Save Projects
           </button>
         </div>
 
@@ -744,25 +760,7 @@ export default function AdminDashboard() {
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (!file) return;
-                  // Show preview filename
-                  setContent((prev) =>
-                    prev
-                      ? {
-                          ...prev,
-                          cv: mergeCV(prev.cv, {
-                            pdfUrl:
-                              prev.cv.pdfUrl // keep existing until saved
-                                .split("/")
-                                .pop()!
-                                .replace(
-                                  /\.pdf$/i,
-                                  "",
-                                ) +
-                              " (new)", // placeholder; real URL saved below
-                          }),
-                        }
-                      : prev,
-                  );
+
                 }}
               />
               <button
@@ -794,15 +792,11 @@ export default function AdminDashboard() {
                   try {
                     const url = await uploadPdf(input.files[0]);
                     if (!url) return;
-                    setContent((prev) =>
-                      prev
-                        ? {
-                            ...prev,
-                            cv: mergeCV(prev.cv, { pdfUrl: url }),
-                          }
-                        : prev,
-                    );
-                    showFlash("CV PDF uploaded & saved ✓");
+                    // Persist the blob URL to the content store immediately
+                    persist({
+                      ...content,
+                      cv: mergeCV(content.cv, { pdfUrl: url }),
+                    });
                   } catch (err) {
                     showFlash(
                       (err as Error).message,
