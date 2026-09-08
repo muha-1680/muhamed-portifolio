@@ -12,7 +12,7 @@ export default async function SiteLayout({
     <div className="portfolio">
       {/* Theme colors chosen in /admin, applied before paint */}
       <style>{`:root{--primary:${content.colors.primary};--bg:${content.colors.bg};}`}</style>
-      <Sidebar name={content.about.name} />
+      <Sidebar name={content.about.name} profilePhoto={content.about.profilePhoto} />
       <main className="content">{children}</main>
     </div>
   );

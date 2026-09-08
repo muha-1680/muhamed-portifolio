@@ -53,7 +53,7 @@ export default async function ContactPage() {
         </a>
 
         <a
-          href={`https://www.linkedin.com/in/muhamed-ahmed-37b945422`}
+          href={`https://www.linkedin.com/in/${contact.linkedin.replace(/^linkedin\.com\/in\//, "").replace(/^@/, "")}`}
           target="_blank"
           rel="noopener noreferrer"
           className="contact-card"
@@ -68,7 +68,7 @@ export default async function ContactPage() {
         </a>
 
         <a
-          href="https://twitter.com/@muhamed83085"
+          href={`https://twitter.com/${contact.twitter.replace(/^@/, "")}`}
           target="_blank"
           rel="noopener noreferrer"
           className="contact-card"
@@ -78,12 +78,12 @@ export default async function ContactPage() {
           </div>
           <div className="contact-info">
             <div className="label">Twitter / X</div>
-            <div className="value">@muhamed83085</div>
+            <div className="value">{contact.twitter}</div>
           </div>
         </a>
 
         <a
-          href="https://t.me/MUHAMED_SHIFAW"
+          href={`https://t.me/${contact.telegram.replace(/^@/, "")}`}
           target="_blank"
           rel="noopener noreferrer"
           className="contact-card"
@@ -93,7 +93,7 @@ export default async function ContactPage() {
           </div>
           <div className="contact-info">
             <div className="label">Telegram</div>
-            <div className="value">@MUHAMED_SHIFAW</div>
+            <div className="value">{contact.telegram}</div>
           </div>
         </a>
       </div>

@@ -3,15 +3,19 @@
     "name": "Muhamed Ahmed Shifaw",
     "title": "Software Developer | Full-Stack Developer | Computer Science Graduate",
     "bio": "Building innovative, secure, and user-focused software solutions. I hold a BSc in Computer Science and a Bachelor of Management, combining technical depth with business perspective. I'm passionate about solving problems through clean code and collaborative development.",
-    "location": "Gondar, Ethiopia"
+    "location": "Gondar, Ethiopia",
+    "profilePhoto": "/my.jpg"
   },
   "contact": {
     "email": "994muhamedahmed@gmail.com",
     "phone": "+251 909 041 680",
     "github": "github.com/muha-1680",
-    "linkedin": "linkedin.com/in/muhamed-ahmed"
+    "linkedin": "linkedin.com/in/muhamed-ahmed",
+    "twitter": "@muhamed83085",
+    "telegram": "@MUHAMED_SHIFAW"
   },
   "skills": [
+    "Full Stack Developer",
     "JavaScript",
     "Python",
     "Java",
@@ -30,25 +34,52 @@
       "title": "Household Services Management System",
       "desc": "University final-year group project. A web-based platform connecting households with service providers, enabling users to request, schedule, and manage services through a centralized system.",
       "role": "Frontend Developer",
-      "tech": ["HTML5", "CSS3", "Bootstrap", "JavaScript", "PHP", "MySQL"]
+      "tech": [
+        "HTML5",
+        "CSS3",
+        "Bootstrap",
+        "JavaScript",
+        "PHP",
+        "MySQL"
+      ]
     },
     {
       "title": "Hotel Management System",
       "desc": "A comprehensive hotel management application to simplify room reservations, customer registration, check-in/check-out processes, and administrative management with reporting features.",
       "role": "Full-Stack Developer",
-      "tech": ["HTML", "CSS", "Bootstrap", "JavaScript", "PHP", "MySQL"]
+      "tech": [
+        "HTML",
+        "CSS",
+        "Bootstrap",
+        "JavaScript",
+        "PHP",
+        "MySQL"
+      ]
     },
     {
       "title": "Distributed Chat System",
       "desc": "A distributed communication application using networking concepts that allows users to exchange messages across multiple clients in real-time using client-server architecture.",
       "role": "Backend Developer",
-      "tech": ["Java", "Socket Programming", "Networking", "Client-Server", "Multi-threading"]
+      "tech": [
+        "Java",
+        "Socket Programming",
+        "Networking",
+        "Client-Server",
+        "Multi-threading"
+      ]
     },
     {
       "title": "Network Infrastructure Simulation",
       "desc": "Designed and simulated a complete enterprise network using Cisco Packet Tracer, including VLANs, routing protocols, DHCP, DNS, and security configurations.",
       "role": "Network Designer",
-      "tech": ["Cisco Packet Tracer", "VLAN", "OSPF", "DHCP", "DNS", "Network Security"]
+      "tech": [
+        "Cisco Packet Tracer",
+        "VLAN",
+        "OSPF",
+        "DHCP",
+        "DNS",
+        "Network Security"
+      ]
     }
   ],
   "experiences": [
@@ -66,5 +97,51 @@
         "Followed organizational security procedures and best practices for data protection."
       ]
     }
-  ]
+  ],
+  "cv": {
+    "pdfUrl": "/Muhamed_Ahmed_FlowCV_Resume_2026-07-24.pdf",
+    "stats": [
+      {
+        "label": "Years Experience",
+        "number": ""
+      },
+      {
+        "label": "Projects Completed",
+        "number": "4"
+      },
+      {
+        "label": "Degrees",
+        "number": "2"
+      },
+      {
+        "label": "Technologies",
+        "number": "full "
+      }
+    ],
+    "profile": "I'm Muhamed Ahmed, a software development professional with a passion for helping companies achieve their growth potential. With degrees in Computer Science and Management, I have extensive experience in relationship building, and I strive to provide innovative solutions that drive success for my clients.",
+    "education": [
+      {
+        "degree": "Bachelor of Science in Computer Science",
+        "institution": "University of Gondar",
+        "date": "2021 – 2026"
+      },
+      {
+        "degree": "Bachelor of Management",
+        "institution": "Othionial College",
+        "date": "2021 – 2026"
+      }
+    ],
+    "languages": {
+      "entries": [
+        {
+          "language": "Amharic",
+          "level": "Native"
+        },
+        {
+          "language": "English",
+          "level": "Professional Working Proficiency"
+        }
+      ]
+    }
+  }
 }

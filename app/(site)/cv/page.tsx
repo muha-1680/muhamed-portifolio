@@ -1,22 +1,15 @@
 import type { Metadata } from "next";
+import { getContent } from "@/lib/content";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "CV",
 };
 
-const PROFESSIONAL_SKILLS = [
-  "Software Development",
-  "Problem Solving",
-  "Team Collaboration",
-  "Analytical Thinking",
-  "Time Management",
-  "Communication",
-  "Technical Documentation",
-  "Adaptability",
-  "Continuous Learning",
-];
+export default async function CVPage() {
+  const { cv, skills, experiences, projects } = await getContent();
 
-export default function CVPage() {
   return (
     <>
       <h2 className="section-title">
@@ -28,7 +21,7 @@ export default function CVPage() {
           <i className="fas fa-download"></i> Muhamed Ahmed - Curriculum Vitae
         </h2>
         <a
-          href="/Muhamed_Ahmed_FlowCV_Resume_2026-07-24.pdf"
+          href={cv.pdfUrl}
           download
           className="download-btn"
         >
@@ -37,22 +30,12 @@ export default function CVPage() {
       </div>
 
       <div className="quick-stats">
-        <div className="stat-box">
-          <div className="stat-number">3+</div>
-          <div className="stat-label">Years Experience</div>
-        </div>
-        <div className="stat-box">
-          <div className="stat-number">8</div>
-          <div className="stat-label">Projects Completed</div>
-        </div>
-        <div className="stat-box">
-          <div className="stat-number">2</div>
-          <div className="stat-label">Degrees</div>
-        </div>
-        <div className="stat-box">
-          <div className="stat-number">5</div>
-          <div className="stat-label">Technologies</div>
-        </div>
+        {cv.stats.map((stat) => (
+          <div className="stat-box" key={stat.label}>
+            <div className="stat-number">{stat.number}</div>
+            <div className="stat-label">{stat.label}</div>
+          </div>
+        ))}
       </div>
 
       <div style={{ marginTop: 20 }}>
@@ -61,13 +44,7 @@ export default function CVPage() {
             <div className="cv-label">
               <i className="fas fa-user"></i> Profile
             </div>
-            <div className="cv-value">
-              I&apos;m Muhamed Ahmed, a software development professional with a
-              passion for helping companies achieve their growth potential. With
-              degrees in Computer Science and Management, I have extensive
-              experience in relationship building, and I strive to provide
-              innovative solutions that drive success for my clients.
-            </div>
+            <div className="cv-value">{cv.profile}</div>
           </div>
 
           <div className="cv-item">
@@ -75,18 +52,17 @@ export default function CVPage() {
               <i className="fas fa-graduation-cap"></i> Education
             </div>
             <div className="cv-value">
-              <strong>Bachelor of Science in Computer Science</strong>
-              <br />
-              University of Gondar
-              <br />
-              2021 – 2026
-              <br />
-              <br />
-              <strong>Bachelor of Management</strong>
-              <br />
-              Othionial College
-              <br />
-              2021 – 2026
+              {cv.education.map((edu, i) => (
+                <div key={i}>
+                  <strong>{edu.degree}</strong>
+                  <br />
+                  {edu.institution}
+                  <br />
+                  {edu.date}
+                  {i < cv.education.length - 1 && <br />}
+                  {i < cv.education.length - 1 && <br />}
+                </div>
+              ))}
             </div>
           </div>
 
@@ -95,9 +71,12 @@ export default function CVPage() {
               <i className="fas fa-globe"></i> Languages
             </div>
             <div className="cv-value">
-              <strong>Amharic</strong> — Native
-              <br />
-              <strong>English</strong> — Professional Working Proficiency
+              {cv.languages.entries.map((lang, i) => (
+                <div key={i}>
+                  <strong>{lang.language}</strong> — {lang.level}
+                  <br />
+                </div>
+              ))}
             </div>
           </div>
 
@@ -106,31 +85,22 @@ export default function CVPage() {
               <i className="fas fa-briefcase"></i> Professional Experience
             </div>
             <div className="cv-value">
-              <strong>IT Intern — Networking &amp; Maintenance</strong>
-              <br />
-              Commercial Bank of Ethiopia (CBE), She Ali Branch - Gondar
-              <br />
-              <span style={{ fontSize: "0.8rem", color: "#6b7280" }}>
-                October 2025 – December 2025
-              </span>
-              <ul>
-                <li>
-                  Assisted in maintaining computer systems and network
-                  infrastructure.
-                </li>
-                <li>Configured LAN connectivity and network devices.</li>
-                <li>Supported router and switch configuration.</li>
-                <li>
-                  Installed and updated operating systems and software.
-                </li>
-                <li>Diagnosed hardware and software issues.</li>
-                <li>Performed preventive system maintenance.</li>
-                <li>
-                  Worked with the IT team to maintain secure banking
-                  operations.
-                </li>
-                <li>Followed IT security policies and procedures.</li>
-              </ul>
+              {experiences.map((exp, i) => (
+                <div key={i}>
+                  <strong>{exp.title}</strong>
+                  <br />
+                  {exp.company}
+                  <br />
+                  <span style={{ fontSize: "0.8rem", color: "#6b7280" }}>
+                    {exp.date}
+                  </span>
+                  <ul>
+                    {exp.responsibilities.map((r, j) => (
+                      <li key={j}>{r}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -139,42 +109,26 @@ export default function CVPage() {
               <i className="fas fa-code"></i> Projects
             </div>
             <div className="cv-value">
-              <strong>Household Services Management System</strong>
-              <br />
-              University Final-Year Group Project
-              <br />
-              <span style={{ fontSize: "0.8rem", color: "#6b7280" }}>
-                January 2025 – September 2026
-              </span>
-              <div style={{ marginTop: 4 }}>
-                <strong>Role:</strong> Frontend Development · User Interface
-                Design · Testing and Documentation · Team Collaboration
-              </div>
-              <div className="chip-group">
-                <span className="chip">HTML</span>
-                <span className="chip">CSS</span>
-                <span className="chip">Bootstrap</span>
-                <span className="chip">JavaScript</span>
-                <span className="chip">PHP</span>
-                <span className="chip">MySQL</span>
-              </div>
-              <br />
-              <strong>Hotel Management System</strong>
-              <br />
-              Web-based application for hotel reservation and customer
-              management.
-              <br />
-              <span style={{ fontSize: "0.8rem", color: "#6b7280" }}>
-                November 2025 – December 2025
-              </span>
-              <div className="chip-group">
-                <span className="chip">HTML</span>
-                <span className="chip">CSS</span>
-                <span className="chip">Bootstrap</span>
-                <span className="chip">JavaScript</span>
-                <span className="chip">PHP</span>
-                <span className="chip">MySQL</span>
-              </div>
+              {projects.map((proj, i) => (
+                <div key={i}>
+                  <strong>{proj.title}</strong>
+                  <br />
+                  {proj.desc}
+                  <br />
+                  <span style={{ fontSize: "0.8rem", color: "#6b7280" }}>
+                    {proj.role}
+                  </span>
+                  <div>
+                    <strong>Role:</strong> {proj.role}
+                  </div>
+                  <div className="chip-group">
+                    {proj.tech.map((t) => (
+                      <span className="chip" key={t}>{t}</span>
+                    ))}
+                  </div>
+                  {i < projects.length - 1 && <br />}
+                </div>
+              ))}
             </div>
           </div>
 
@@ -184,7 +138,7 @@ export default function CVPage() {
             </div>
             <div className="cv-value">
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                {PROFESSIONAL_SKILLS.map((skill) => (
+                {skills.map((skill) => (
                   <span
                     key={skill}
                     className="chip"

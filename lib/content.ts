@@ -6,6 +6,7 @@ export interface AboutContent {
   title: string;
   bio: string;
   location: string;
+  profilePhoto: string;
 }
 
 export interface ContactContent {
@@ -13,6 +14,8 @@ export interface ContactContent {
   phone: string;
   github: string;
   linkedin: string;
+  twitter: string;
+  telegram: string;
 }
 
 export interface ProjectContent {
@@ -22,6 +25,12 @@ export interface ProjectContent {
   tech: string[];
 }
 
+export interface EducationEntry {
+  degree: string;
+  institution: string;
+  date: string;
+}
+
 export interface ExperienceContent {
   title: string;
   company: string;
@@ -29,6 +38,17 @@ export interface ExperienceContent {
   date: string;
   responsibilities: string[];
 }
+
+export interface LanguagesContent {
+  entries: { language: string; level: string }[];
+}
+
+export interface CVContent {
+  pdfUrl: string;
+  stats: { label: string; number: string }[];
+  profile: string;
+  education: EducationEntry[];
+  languages: LanguagesContent;}
 
 export interface ColorsContent {
   primary: string;
@@ -42,6 +62,7 @@ export interface Content {
   colors: ColorsContent;
   projects: ProjectContent[];
   experiences: ExperienceContent[];
+  cv: CVContent;
 }
 
 /** Default content — seeded from the original static HTML site. */
@@ -51,12 +72,15 @@ export const defaultContent: Content = {
     title: "Software Developer | Full-Stack Developer | Computer Science Graduate",
     bio: "Building innovative, secure, and user-focused software solutions. I hold a BSc in Computer Science and a Bachelor of Management, combining technical depth with business perspective. I'm passionate about solving problems through clean code and collaborative development.",
     location: "Gondar, Ethiopia",
+    profilePhoto: "/my.jpg",
   },
   contact: {
     email: "994muhamedahmed@gmail.com",
     phone: "+251 909 041 680",
     github: "github.com/muha-1680",
     linkedin: "linkedin.com/in/muhamed-ahmed",
+    twitter: "@muhamed83085",
+    telegram: "@MUHAMED_SHIFAW",
   },
   skills: [
     "JavaScript",
@@ -68,6 +92,26 @@ export const defaultContent: Content = {
     "MySQL",
     "AWS",
   ],
+  cv: {
+    pdfUrl: "/Muhamed_Ahmed_FlowCV_Resume_2026-07-24.pdf",
+    stats: [
+      { label: "Years Experience", number: "3+" },
+      { label: "Projects Completed", number: "8" },
+      { label: "Degrees", number: "2" },
+      { label: "Technologies", number: "5" },
+    ],
+    profile: "I'm Muhamed Ahmed, a software development professional with a passion for helping companies achieve their growth potential. With degrees in Computer Science and Management, I have extensive experience in relationship building, and I strive to provide innovative solutions that drive success for my clients.",
+    education: [
+      { degree: "Bachelor of Science in Computer Science", institution: "University of Gondar", date: "2021 – 2026" },
+      { degree: "Bachelor of Management", institution: "Othionial College", date: "2021 – 2026" },
+    ],
+    languages: {
+      entries: [
+        { language: "Amharic", level: "Native" },
+        { language: "English", level: "Professional Working Proficiency" },
+      ],
+    },
+  },
   colors: {
     primary: "#2563eb",
     bg: "#f0f2f5",
@@ -121,7 +165,13 @@ const dataFile = () => path.join(process.cwd(), "data", "content.json");
 function mergeWithDefaults(raw: Partial<Content> | null | undefined): Content {
   const src = raw ?? {};
   return {
-    about: { ...defaultContent.about, ...(src.about ?? {}) },
+    about: {
+      ...defaultContent.about,
+      ...(src.about ?? {}),
+      profilePhoto:
+        src.about?.profilePhoto ??
+        defaultContent.about.profilePhoto,
+    },
     contact: { ...defaultContent.contact, ...(src.contact ?? {}) },
     skills: Array.isArray(src.skills) ? src.skills : defaultContent.skills,
     colors: { ...defaultContent.colors, ...(src.colors ?? {}) },
@@ -129,6 +179,20 @@ function mergeWithDefaults(raw: Partial<Content> | null | undefined): Content {
     experiences: Array.isArray(src.experiences)
       ? src.experiences
       : defaultContent.experiences,
+    cv: {
+      ...defaultContent.cv,
+      ...(src.cv ?? {}),
+      education: Array.isArray(src.cv?.education)
+        ? src.cv!.education
+        : defaultContent.cv.education,
+      languages: {
+        ...defaultContent.cv.languages,
+        ...(src.cv?.languages ?? {}),
+        entries: Array.isArray(src.cv?.languages?.entries)
+          ? src.cv!.languages!.entries
+          : defaultContent.cv.languages.entries,
+      },
+    },
   };
 }
 

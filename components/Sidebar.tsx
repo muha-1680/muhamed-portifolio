@@ -12,19 +12,25 @@ const NAV_ITEMS = [
   { href: "/contact", icon: "fa-envelope", label: "Contact" },
 ];
 
-export default function Sidebar({ name }: { name: string }) {
+export default function Sidebar({
+  name,
+  profilePhoto,
+}: {
+  name: string;
+  profilePhoto?: string;
+}) {
   const [first, ...rest] = name.trim().split(/\s+/);
 
   return (
     <aside className="sidebar">
       <div className="profile-pic">
         <Image
-          src="/my.jpg"
+          src={profilePhoto ?? "/my.jpg"}
           alt="Muhamed Ahmed"
           width={120}
           height={120}
           priority
-        />
+    />
         <h2>
           <span>{first}</span> {rest.join(" ")}
         </h2>
