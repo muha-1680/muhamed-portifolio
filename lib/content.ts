@@ -1,3 +1,4 @@
+import { put, get } from "@vercel/blob";
 import { promises as fs } from "fs";
 import path from "path";
 
@@ -8,7 +9,6 @@ export interface AboutContent {
   location: string;
   profilePhoto: string;
 }
-
 export interface ContactContent {
   email: string;
   phone: string;
@@ -17,20 +17,17 @@ export interface ContactContent {
   twitter: string;
   telegram: string;
 }
-
 export interface ProjectContent {
   title: string;
   desc: string;
   role: string;
   tech: string[];
 }
-
 export interface EducationEntry {
   degree: string;
   institution: string;
   date: string;
 }
-
 export interface ExperienceContent {
   title: string;
   company: string;
@@ -38,23 +35,20 @@ export interface ExperienceContent {
   date: string;
   responsibilities: string[];
 }
-
 export interface LanguagesContent {
   entries: { language: string; level: string }[];
 }
-
 export interface CVContent {
   pdfUrl: string;
   stats: { label: string; number: string }[];
   profile: string;
   education: EducationEntry[];
-  languages: LanguagesContent;}
-
+  languages: LanguagesContent;
+}
 export interface ColorsContent {
   primary: string;
   bg: string;
 }
-
 export interface Content {
   about: AboutContent;
   contact: ContactContent;
@@ -160,7 +154,14 @@ export const defaultContent: Content = {
   ],
 };
 
-const dataFile = () => path.join(process.cwd(), "data", "content.json");
+const BLOB_PATH = "portfolio-content";
+
+function hasBlobCredentials(): boolean {
+  return !!(
+    process.env.BLOB_READ_WRITE_TOKEN ||
+    (process.env.BLOB_STORE_ID && process.env.VERCEL_OIDC_TOKEN)
+  );
+}
 
 function mergeWithDefaults(raw: Partial<Content> | null | undefined): Content {
   const src = raw ?? {};
@@ -196,20 +197,64 @@ function mergeWithDefaults(raw: Partial<Content> | null | undefined): Content {
   };
 }
 
-/** Read the current content; falls back to defaults if the file is missing or invalid. */
+async function streamToString(stream: ReadableStream<Uint8Array>): Promise<string> {
+  const chunks: Uint8Array[] = [];
+  const reader = stream.getReader();
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (value) chunks.push(value);
+  }
+  const total = chunks.reduce((acc, c) => acc + c.length, 0);
+  const buf = new Uint8Array(total);
+  let off = 0;
+  for (const c of chunks) {
+    buf.set(c, off);
+    off += c.length;
+  }
+  return new TextDecoder().decode(buf);
+}
+
+function filePath(): string {
+  return path.join(process.cwd(), "data", "content.json");
+}
+
+/** Read the current content. Uses Vercel Blob in production; falls back to data/content.json locally when blob credentials are not configured. */
+
+/** Read the current content. Uses Vercel Blob in production; falls back to data/content.json locally when blob credentials are not configured. */
 export async function getContent(): Promise<Content> {
+  if (hasBlobCredentials()) {
+    try {
+      const res = await get(BLOB_PATH, { access: "public", useCache: false });
+      if (!res || res.statusCode !== 200) return defaultContent;
+      const raw = await streamToString(res.stream);
+      if (!raw) return defaultContent;
+      return mergeWithDefaults(JSON.parse(raw) as Partial<Content>);
+    } catch {
+      return defaultContent;
+    }
+  }
+  // File fallback (local development without blob token)
   try {
-    const raw = await fs.readFile(dataFile(), "utf8");
+    const raw = await fs.readFile(filePath(), "utf8");
     return mergeWithDefaults(JSON.parse(raw) as Partial<Content>);
   } catch {
     return defaultContent;
   }
 }
 
-/** Persist content (merged with defaults) to data/content.json. */
+/** Persist content (merged with defaults). Uses Vercel Blob in production; falls back to data/content.json locally when blob credentials are not configured. */
 export async function saveContent(content: Partial<Content>): Promise<Content> {
   const merged = mergeWithDefaults(content);
-  const file = dataFile();
+  if (hasBlobCredentials()) {
+    await put(BLOB_PATH, JSON.stringify(merged, null, 2), {
+      access: "public",
+      contentType: "application/json",
+    });
+    return merged;
+  }
+  // File fallback (local development without blob token)
+  const file = filePath();
   await fs.mkdir(path.dirname(file), { recursive: true });
   const tmp = `${file}.tmp`;
   await fs.writeFile(tmp, JSON.stringify(merged, null, 2), "utf8");

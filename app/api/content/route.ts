@@ -23,7 +23,8 @@ export async function PUT(request: Request) {
   try {
     const saved = await saveContent(body);
     return NextResponse.json(saved);
-  } catch {
+  } catch (err) {
+    console.error("[api/content] save failed:", err);
     return NextResponse.json({ error: "Failed to save content" }, { status: 500 });
   }
 }

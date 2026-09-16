@@ -1,9 +1,14 @@
 import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
+import { isAuthenticated } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
+  if (!(await isAuthenticated())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const form = await request.formData();
     const file = form.get("file") as File | null;
@@ -26,7 +31,6 @@ export async function POST(request: Request) {
     const pathname = `/cv-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "-")}`;
     const blob = await put(pathname, file, {
       access: "public",
-      token: process.env.BLOB_READ_WRITE_TOKEN,
     });
 
     return NextResponse.json({ ok: true, url: blob.url });
