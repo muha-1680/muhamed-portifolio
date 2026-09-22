@@ -1,5 +1,5 @@
 import Sidebar from "@/components/Sidebar";
-import { getContent } from "@/lib/content";
+import { getContent } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 

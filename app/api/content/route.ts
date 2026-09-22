@@ -1,15 +1,25 @@
 import { NextResponse } from "next/server";
+
+import { getContent, saveContent } from "@/lib/db";
 import { isAuthenticated } from "@/lib/auth";
-import { getContent, saveContent, type Content } from "@/lib/content";
+import type { Content } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
 
 /** Public: read the site content. */
 export async function GET() {
-  return NextResponse.json(await getContent());
+  try {
+    return NextResponse.json(await getContent());
+  } catch (err) {
+    console.error("[api/content] read failed:", err);
+    return NextResponse.json(
+      { error: "Failed to read content" },
+      { status: 500 },
+    );
+  }
 }
 
-/** Admin only: persist the site content. */
+/** Admin only: persist the site content (patch semantics — omitted sections stay intact). */
 export async function PUT(request: Request) {
   if (!(await isAuthenticated())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

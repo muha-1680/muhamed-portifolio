@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getContent } from "@/lib/content";
+import { getContent } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 

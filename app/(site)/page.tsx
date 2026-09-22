@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getContent } from "@/lib/content";
+import { getContent } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 

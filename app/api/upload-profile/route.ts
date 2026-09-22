@@ -1,5 +1,7 @@
 import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
+
+import { saveContent } from "@/lib/db";
 import { isAuthenticated } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
@@ -16,10 +18,7 @@ export async function POST(request: Request) {
   }
 
   if (file.size > 5 * 1024 * 1024) {
-    return NextResponse.json(
-      { error: "File too large (max 5MB)" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "File too large (max 5MB)" }, { status: 400 });
   }
 
   const ext = file.name.split(".").pop()?.toLowerCase() || "";
@@ -31,23 +30,25 @@ export async function POST(request: Request) {
   }
 
   try {
-    const blob = await put(
-      `profile-${Date.now()}.${ext}`,
-      file,
-      {
-        access: "public",
-        contentType: file.type || `image/${ext === "jpeg" ? "jpeg" : ext}`,
-      },
-    );
+    const blob = await put(`profile-${Date.now()}.${ext}`, file, {
+      access: "public",
+      contentType: file.type || `image/${ext === "jpeg" ? "jpeg" : ext}`,
+    });
+
+    // Persist the URL straight into the DB so the photo appears site-wide
+    // without needing a separate "Save About" click.
+    const saved = await saveContent({ about: { profilePhoto: blob.url } });
+
     return NextResponse.json({
       ok: true,
       url: blob.url,
       name: blob.pathname,
+      profilePhoto: saved.about.profilePhoto,
     });
   } catch (err) {
-    console.error("Blob upload failed:", err);
+    console.error("[api/upload-profile] failed:", err);
     return NextResponse.json(
-      { error: "Upload failed — check VERCEL_BLOB_* env vars" },
+      { error: "Upload failed — check blob credentials and DATABASE_URL" },
       { status: 500 },
     );
   }

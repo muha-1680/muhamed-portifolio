@@ -36,6 +36,12 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local runtime artifacts (pg data, logs, run docs)
+.freebuff/pgdata/
+.freebuff/pglog/
+.freebuff/*.log
+.freebuff/*.log.err
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

@@ -1,63 +1,87 @@
 # Muhamed Ahmed · Portfolio
 
-Personal portfolio built with **Next.js 16 (App Router) + TypeScript**. Rebuilt from
+Personal portfolio built with **Next.js 16 (App Router) + TypeScript + Prisma + Postgres**. Rebuilt from
 the original static HTML site with the same visual design, plus a working
-admin panel with server-side authentication and persistent content storage.
+admin panel with server-side authentication and database-backed content storage.
 
 ## Stack
 
 - Next.js 16 (App Router) + React 19 + TypeScript
+- **Prisma ORM + Postgres** — all site content lives in the database
+- Vercel Blob — file uploads only (profile photo, CV PDF); the DB stores the URLs
 - Plain CSS (ported 1:1 from the original site; no UI framework)
 - Font Awesome via CDN
-- Content persisted to **Vercel Blob** (falls back to `data/content.json` locally when no blob token is configured)
 
 ## Getting started
 
 ```bash
 npm install
 cp .env.example .env.local   # then fill in real values
+npx prisma migrate deploy    # create tables
+npm run db:seed              # load starter content from data/content.json
 npm run dev                  # http://localhost:3000
 ```
 
 Required env vars (see `.env.example`):
 
-| Variable               | Purpose                                                           |
-| ---------------------- | ----------------------------------------------------------------- |
-| `ADMIN_PASSWORD`       | Password for `/admin` (change the default!)                       |
-| `AUTH_SECRET`          | Secret that signs the admin session cookie                        |
-| `BLOB_READ_WRITE_TOKEN`| **Required on Vercel** for admin saves AND file uploads (photo, CV PDF). Get it from Vercel Dashboard → Project → Storage → Blob → "Generate API key". |
+| Variable                | Purpose                                                                 |
+| ----------------------- | ----------------------------------------------------------------------- |
+| `ADMIN_PASSWORD`        | Password for `/admin` (change the default!)                             |
+| `AUTH_SECRET`           | Secret that signs the admin session cookie                              |
+| `DATABASE_URL`          | **Required.** Postgres connection string (Vercel Postgres pooled URL)   |
+| `BLOB_READ_WRITE_TOKEN` | Only for file uploads (photo, CV PDF). Content lives in Postgres.       |
 
 Generate a secret with:
 `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
 
-### Local development without a blob token
+## Database
 
-If `BLOB_READ_WRITE_TOKEN` is not set, the app falls back to reading/writing
-`data/content.json` on disk. This is fine for local development — the admin
-panel works fully. On Vercel, the token is required (serverless functions
-can't write to disk).
+All content sections are Postgres tables managed by Prisma:
+
+- Single-row sections: `About`, `Contact`, `ColorTheme`, `Cv`
+- List sections: `projects`, `experiences`, `skills`, `cv_stats`, `cv_education`, `cv_languages`
+
+Common commands:
+
+```bash
+npx prisma migrate deploy   # apply migrations (production + local)
+npm run db:seed             # (re)load starter content from data/content.json
+npm run db:studio           # browse/edit data in Prisma Studio
+npx prisma generate         # regenerate the client after schema changes
+```
 
 ## Admin panel
 
 - URL: `http://localhost:3000/admin`
-- Default password: `admin123` (change `ADMIN_PASSWORD` in `.env.local`)
-- Edits persist to Vercel Blob on production, or to `data/content.json` locally
+- Password: value of `ADMIN_PASSWORD`
+- Every Save button writes straight to Postgres — public pages read the DB on
+  every request (`force-dynamic`), so changes appear immediately
+- Photo and CV PDF uploads go to Vercel Blob; the returned URL is saved into
+  the DB automatically as part of the upload request
 
 ## Deploying to Vercel
 
 1. Push this repo to GitHub
 2. Import the project at [vercel.com](https://vercel.com)
-3. Add these Environment Variables in Vercel project settings:
+3. Create the database: Project → **Storage → Postgres** → create/connect a store.
+   Vercel exposes `DATABASE_URL` automatically (pooled connection).
+4. Add these Environment Variables in Vercel project settings:
    - `ADMIN_PASSWORD`
    - `AUTH_SECRET`
-   - `BLOB_READ_WRITE_TOKEN` (from Vercel Dashboard → Storage → Blob)
-4. Deploy
+   - `BLOB_READ_WRITE_TOKEN` (from Vercel Dashboard → Storage → Blob) — only needed for uploads
+   - `DATABASE_URL` — usually auto-injected by the Postgres integration
+5. Deploy, then run the migration + seed once against the production DB:
+   ```bash
+   # from your machine, with the production DATABASE_URL exported:
+   npx prisma migrate deploy
+   npm run db:seed
+   ```
+   (Or add `prisma migrate deploy && npm run db:seed` to the build command.)
 
 The site will be available at `https://muhamed-ahmed-portfolio.vercel.app`
 
 ## Note on file uploads
 
-Profile photo and CV PDF uploads use Vercel Blob. They require
-`BLOB_READ_WRITE_TOKEN` to be set in the Vercel project environment variables.
-Without it, the upload buttons will show an error, but text edits via the admin
-panel still work (they also use the blob store).
+Profile photo and CV PDF uploads use Vercel Blob and require
+`BLOB_READ_WRITE_TOKEN` in the environment. Text content no longer depends on
+Blob at all — it lives entirely in Postgres via Prisma.

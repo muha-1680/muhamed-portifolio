@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- single-row sections ----------
+
+model About {
+  id           Int      @id @default(1)
+  name         String
+  title        String
+  bio          String
+  location     String
+  profilePhoto String
+  updatedAt    DateTime @updatedAt
+}
+
+model Contact {
+  id        Int      @id @default(1)
+  email     String
+  phone     String
+  github    String
+  linkedin  String
+  twitter   String
+  telegram  String
+  updatedAt DateTime @updatedAt
+}
+
+model ColorTheme {
+  id        Int      @id @default(1)
+  primary   String
+  bg        String
+  updatedAt DateTime @updatedAt
+}
+
+model Cv {
+  id        Int      @id @default(1)
+  pdfUrl    String
+  profile   String
+  stats     CvStat[]
+  education CvEducation[]
+  languages CvLanguage[]
+  updatedAt DateTime @updatedAt
+}
+
+// ---------- list sections ----------
+
+model Project {
+  id    Int      @id @default(autoincrement())
+  order Int      @unique
+  title String
+  desc  String
+  role  String
+  tech  String[]
+
+  @@map("projects")
+}
+
+model Experience {
+  id               Int      @id @default(autoincrement())
+  order            Int      @unique
+  title            String
+  company          String
+  location         String
+  date             String
+  responsibilities String[]
+
+  @@map("experiences")
+}
+
+model Skill {
+  id    Int    @id @default(autoincrement())
+  order Int    @unique
+  name  String
+
+  @@map("skills")
+}
+
+model CvStat {
+  id     Int    @id @default(autoincrement())
+  cvId   Int
+  cv     Cv     @relation(fields: [cvId], references: [id], onDelete: Cascade)
+  order  Int
+  label  String
+  number String
+
+  @@unique([cvId, order])
+  @@map("cv_stats")
+}
+
+model CvEducation {
+  id          Int    @id @default(autoincrement())
+  cvId        Int
+  cv          Cv     @relation(fields: [cvId], references: [id], onDelete: Cascade)
+  order       Int
+  degree      String
+  institution String
+  date        String
+
+  @@unique([cvId, order])
+  @@map("cv_education")
+}
+
+model CvLanguage {
+  id       Int    @id @default(autoincrement())
+  cvId     Int
+  cv       Cv     @relation(fields: [cvId], references: [id], onDelete: Cascade)
+  order    Int
+  language String
+  level    String
+
+  @@unique([cvId, order])
+  @@map("cv_languages")
+}

@@ -1,5 +1,7 @@
 import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
+
+import { saveContent } from "@/lib/db";
 import { isAuthenticated } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
@@ -33,10 +35,18 @@ export async function POST(request: Request) {
       access: "public",
     });
 
-    return NextResponse.json({ ok: true, url: blob.url });
+    // Persist the URL straight into the DB so the new PDF is live immediately.
+    const saved = await saveContent({ cv: { pdfUrl: blob.url } });
+
+    return NextResponse.json({
+      ok: true,
+      url: blob.url,
+      pdfUrl: saved.cv.pdfUrl,
+    });
   } catch (err: unknown) {
     const message =
       err instanceof Error ? err.message : "Failed to upload CV PDF";
+    console.error("[api/upload-cv] failed:", err);
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
