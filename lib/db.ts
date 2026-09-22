@@ -13,10 +13,24 @@ import {
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
+function resolveDatabaseUrl(): string | undefined {
+  const raw =
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_PRISMA_URL ||
+    process.env.POSTGRES_URL;
+  if (!raw) return raw;
+  // Vercel Postgres / Neon pooled endpoints go through PgBouncer, which requires
+  // disabling Prisma's prepared statements to avoid "prepared statement already exists".
+  if (/pgbouncer=true/.test(raw)) return raw;
+  return raw.includes("?")
+    ? `${raw}&pgbouncer=true&connection_limit=1`
+    : `${raw}?pgbouncer=true&connection_limit=1`;
+}
+
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
-    datasources: { db: { url: process.env.DATABASE_URL } },
+    datasources: { db: { url: resolveDatabaseUrl() } },
   });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
