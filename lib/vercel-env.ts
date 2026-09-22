@@ -46,12 +46,13 @@ export async function updateVercelEnvVar(
     };
   }
 
-  const url = `${API_BASE}/v9/projects/${projectId}/env/${name}?teamId=${orgId}&upsert=true`;
+  const base = `${API_BASE}/v10/projects/${projectId}/env?teamId=${orgId}&upsert=true`;
 
   try {
-    // Upsert across production, preview and development in one call (v9 body).
-    const res = await fetch(url, {
-      method: "PATCH",
+    // v10 upsert: POST creates the var or replaces all existing targets in one call.
+    // (PATCH against a sensitive var 404s because its value is unreadable.)
+    const res = await fetch(base, {
+      method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
