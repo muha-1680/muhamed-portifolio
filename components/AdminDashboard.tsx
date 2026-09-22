@@ -14,6 +14,56 @@ export default function AdminDashboard() {
   } | null>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // ---------- change password state ----------
+  const [pwdCurrent, setPwdCurrent] = useState("");
+  const [pwdNext, setPwdNext] = useState("");
+  const [pwdConfirm, setPwdConfirm] = useState("");
+  const [pwdBusy, setPwdBusy] = useState(false);
+
+  async function changePassword() {
+    if (pwdNext.length < 8) {
+      showFlash("New password must be at least 8 characters.", "error");
+      return;
+    }
+    if (pwdNext !== pwdConfirm) {
+      showFlash("New passwords do not match.", "error");
+      return;
+    }
+    setPwdBusy(true);
+    try {
+      const res = await fetch("/api/auth/password", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          currentPassword: pwdCurrent,
+          newPassword: pwdNext,
+        }),
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        ok?: boolean;
+        persisted?: boolean;
+        error?: string;
+      };
+      if (!res.ok) {
+        showFlash(data.error || "Failed to change password.", "error");
+        return;
+      }
+      setPwdCurrent("");
+      setPwdNext("");
+      setPwdConfirm("");
+      showFlash(
+        data.persisted
+          ? "Password changed & saved ✓"
+          : "Password accepted — but not persisted (VERCEL_TOKEN missing)",
+        data.persisted ? "success" : "error",
+      );
+    } catch {
+      showFlash("Network error — please try again.", "error");
+    } finally {
+      setPwdBusy(false);
+    }
+  }
+
   useEffect(() => {
     fetch("/api/content")
       .then((res) => res.json())
@@ -1123,6 +1173,52 @@ export default function AdminDashboard() {
             }}
           >
             <i className="fas fa-save"></i> Save Contact
+          </button>
+        </div>
+
+        {/* ===================== ACCOUNT / SECURITY ===================== */}
+        <div className="section-card" id="account">
+          <div className="section-card-header">
+            <h3>
+              <i className="fas fa-shield-alt"></i> Account & Security
+            </h3>
+            <span className="section-badge">Password</span>
+          </div>
+
+          <label>Current Password</label>
+          <input
+            type="password"
+            value={pwdCurrent}
+            onChange={(e) => setPwdCurrent(e.target.value)}
+            autoComplete="current-password"
+            placeholder="Enter current password"
+          />
+
+          <label>New Password</label>
+          <input
+            type="password"
+            value={pwdNext}
+            onChange={(e) => setPwdNext(e.target.value)}
+            autoComplete="new-password"
+            placeholder="At least 8 characters"
+          />
+
+          <label>Confirm New Password</label>
+          <input
+            type="password"
+            value={pwdConfirm}
+            onChange={(e) => setPwdConfirm(e.target.value)}
+            autoComplete="new-password"
+            placeholder="Repeat new password"
+          />
+
+          <button
+            className="save-btn"
+            disabled={pwdBusy}
+            onClick={changePassword}
+          >
+            <i className={`fas ${pwdBusy ? "fa-spinner fa-spin" : "fa-key"}`}></i>
+            {pwdBusy ? "Updating…" : "Change Password"}
           </button>
         </div>
       </div>
