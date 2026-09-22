@@ -20,6 +20,11 @@ export default function AdminDashboard() {
   const [pwdConfirm, setPwdConfirm] = useState("");
   const [pwdBusy, setPwdBusy] = useState(false);
 
+  // ---------- photo preview state ----------
+  // The chosen file's local preview lives here, NOT in content.about.profilePhoto,
+  // so a blob: preview URL can never be persisted to the database.
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+
   async function changePassword() {
     if (pwdNext.length < 8) {
       showFlash("New password must be at least 8 characters.", "error");
@@ -279,14 +284,16 @@ export default function AdminDashboard() {
           {/* Photo upload widget */}
           <div className="photo-upload-widget">
             <img
-              src={content.about.profilePhoto ?? "/my.jpg"}
+              src={photoPreview ?? content.about.profilePhoto ?? "/my.jpg"}
               alt="Current profile photo"
               className="current-photo"
             />
             <div className="photo-info">
               <div className="photo-label">Profile Photo</div>
               <div className="photo-filename">
-                {content.about.profilePhoto?.replace(/^.*\//, "") ??
+                {(photoPreview
+                  ? "(new photo — click Upload & Save)"
+                  : content.about.profilePhoto?.replace(/^.*\//, "")) ??
                   "my.jpg"}
               </div>
               <div className="photo-actions">
@@ -298,18 +305,8 @@ export default function AdminDashboard() {
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (!file) return;
-                    const preview = URL.createObjectURL(file);
-                    setContent((prev) =>
-                      prev
-                        ? {
-                            ...prev,
-                            about: {
-                              ...prev.about,
-                              profilePhoto: preview,
-                            },
-                          }
-                        : prev,
-                    );
+                    // Preview only — the DB value is updated by Upload & Save.
+                    setPhotoPreview(URL.createObjectURL(file));
                   }}
                 />
                 <button
@@ -327,47 +324,33 @@ export default function AdminDashboard() {
                 <button
                   className="save-photo-btn"
                   onClick={async () => {
-                    const preview =
-                      content.about.profilePhoto ??
-                      "/my.jpg";
-                    const isLocalPreview =
-                      preview.startsWith("blob:") ||
-                      preview === "/my.jpg";
-
-                    if (isLocalPreview) {
-                      const input =
-                        document.getElementById(
-                          "profilePhotoInput",
-                        ) as HTMLInputElement;
-                      if (!input?.files?.[0]) {
-                        showFlash("Please choose a photo first.", "error");
-                        return;
-                      }
-                      try {
-                        const url = await uploadProfilePhoto(
-                          input.files[0],
-                        );
-                        if (!url) return;
-                        // Persist the blob URL to the content store immediately
-                        persist({
-                          ...content,
-                          about: {
-                            ...content.about,
-                            profilePhoto: url,
-                          },
-                        });
-                      } catch (err) {
-                        showFlash(
-                          (err as Error).message,
-                          "error",
-                        );
-                      }
+                    const input =
+                      document.getElementById(
+                        "profilePhotoInput",
+                      ) as HTMLInputElement;
+                    if (!input?.files?.[0]) {
+                      showFlash("Please choose a photo first.", "error");
                       return;
                     }
-
-                    // Already a blob URL — just persist
-                    persist(content);
-                    showFlash("Photo saved ✓");
+                    try {
+                      const url = await uploadProfilePhoto(input.files[0]);
+                      if (!url) return;
+                      setPhotoPreview(null);
+                      input.value = "";
+                      // uploadProfilePhoto already persisted the URL into the
+                      // DB; refresh local state so the widget shows it.
+                      setContent((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              about: { ...prev.about, profilePhoto: url },
+                            }
+                          : prev,
+                      );
+                      showFlash("Photo uploaded & saved ✓");
+                    } catch (err) {
+                      showFlash((err as Error).message, "error");
+                    }
                   }}
                 >
                   <i className="fas fa-cloud-upload-alt"></i>
@@ -420,6 +403,15 @@ export default function AdminDashboard() {
           <button
             className="save-btn"
             onClick={() => {
+              // Safety: never persist a local blob: preview URL. Revert to the
+              // last known-good value if one somehow slipped into state.
+              if (content.about.profilePhoto?.startsWith("blob:")) {
+                persist({
+                  ...content,
+                  about: { ...content.about, profilePhoto: "/my.jpg" },
+                });
+                return;
+              }
               persist(content);
             }}
           >
