@@ -169,6 +169,34 @@ export default function AdminDashboard() {
     );
   }
 
+  function setServiceField(
+    index: number,
+    field: "icon" | "title" | "desc",
+    value: string,
+  ) {
+    setContent((prev) => {
+      if (!prev) return prev;
+      const services = prev.services.map((s, i) =>
+        i === index ? { ...s, [field]: value } : s,
+      );
+      return { ...prev, services };
+    });
+  }
+
+  function setTestimonialField(
+    index: number,
+    field: "quote" | "author" | "role",
+    value: string,
+  ) {
+    setContent((prev) => {
+      if (!prev) return prev;
+      const testimonials = prev.testimonials.map((t, i) =>
+        i === index ? { ...t, [field]: value } : t,
+      );
+      return { ...prev, testimonials };
+    });
+  }
+
   function setCVStat(index: number, field: "label" | "number", value: string) {
     setContent((prev) => {
       if (!prev) return prev;
@@ -652,6 +680,148 @@ export default function AdminDashboard() {
             }}
           >
             <i className="fas fa-save"></i> Save Projects
+          </button>
+        </div>
+
+        {/* ===================== SERVICES ===================== */}
+        <div className="section-card" id="services">
+          <div className="section-card-header">
+            <h3>
+              <i className="fas fa-hand-sparkles"></i> Services
+            </h3>
+            <span className="section-badge">Offer</span>
+          </div>
+
+          {content.services.map((svc, i) => (
+            <div className="project-item" key={i}>
+              <div className="item-header">
+                <span className="item-index">#{i + 1}</span>
+                <button
+                  className="delete-btn"
+                  onClick={() => {
+                    const next = content.services.filter((_, j) => j !== i);
+                    setContent((p) => (p ? { ...p, services: next } : p));
+                  }}
+                >
+                  <i className="fas fa-trash"></i> Remove
+                </button>
+              </div>
+              <input
+                type="text"
+                placeholder="Font Awesome icon class (e.g. fas fa-code)"
+                value={svc.icon}
+                onChange={(e) => setServiceField(i, "icon", e.target.value)}
+              />
+              <input
+                type="text"
+                placeholder="Service Title"
+                value={svc.title}
+                onChange={(e) => setServiceField(i, "title", e.target.value)}
+              />
+              <textarea
+                placeholder="Description"
+                value={svc.desc}
+                onChange={(e) => setServiceField(i, "desc", e.target.value)}
+              />
+            </div>
+          ))}
+
+          <button
+            className="add-item-btn"
+            onClick={() => {
+              if (!content) return;
+              const next: typeof content = {
+                ...content,
+                services: [
+                  ...content.services,
+                  {
+                    icon: "fas fa-star",
+                    title: "New Service",
+                    desc: "Description of the service.",
+                  },
+                ],
+              };
+              persist(next);
+            }}
+          >
+            <i className="fas fa-plus"></i> Add Service
+          </button>
+
+          <button className="save-btn" onClick={() => persist(content)}>
+            <i className="fas fa-save"></i> Save Services
+          </button>
+        </div>
+
+        {/* ===================== TESTIMONIALS ===================== */}
+        <div className="section-card" id="testimonials">
+          <div className="section-card-header">
+            <h3>
+              <i className="fas fa-quote-right"></i> Testimonials
+            </h3>
+            <span className="section-badge">Quotes</span>
+          </div>
+
+          {content.testimonials.map((t, i) => (
+            <div className="project-item" key={i}>
+              <div className="item-header">
+                <span className="item-index">#{i + 1}</span>
+                <button
+                  className="delete-btn"
+                  onClick={() => {
+                    const next = content.testimonials.filter((_, j) => j !== i);
+                    setContent((p) => (p ? { ...p, testimonials: next } : p));
+                  }}
+                >
+                  <i className="fas fa-trash"></i> Remove
+                </button>
+              </div>
+              <textarea
+                placeholder="Quote"
+                value={t.quote}
+                onChange={(e) => setTestimonialField(i, "quote", e.target.value)}
+              />
+              <div className="admin-field-row">
+                <input
+                  className="admin-field-input"
+                  type="text"
+                  placeholder="Author name"
+                  value={t.author}
+                  onChange={(e) => setTestimonialField(i, "author", e.target.value)}
+                />
+                <input
+                  className="admin-field-input"
+                  type="text"
+                  placeholder="Role / Company"
+                  value={t.role}
+                  onChange={(e) => setTestimonialField(i, "role", e.target.value)}
+                />
+              </div>
+            </div>
+          ))}
+
+          <button
+            className="add-item-btn"
+            onClick={() => {
+              if (!content) return;
+              const next: typeof content = {
+                ...content,
+                testimonials: [
+                  ...content.testimonials,
+                  {
+                    quote: "Great to work with.",
+                    author: "New Person",
+                    role: "Role, Company",
+                  },
+                ],
+              };
+              persist(next);
+            }}
+          >
+            <i className="fas fa-plus"></i> Add Testimonial
+          </button>
+
+          <button className="save-btn" onClick={() => persist(content)}>
+            <i className="fas fa-save"></i> Save Testimonials
           </button>
         </div>
 

@@ -9,6 +9,8 @@ import {
   type CVContent,
   type ExperienceContent,
   type ProjectContent,
+  type ServiceContent,
+  type TestimonialContent,
 } from "@/lib/content";
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
@@ -61,7 +63,7 @@ export async function getContent(): Promise<Content> {
 }
 
 async function readContentFromDb(): Promise<Content> {
-  const [about, contact, colors, cv, projects, experiences, skills] =
+  const [about, contact, colors, cv, projects, experiences, skills, services, testimonials] =
     await Promise.all([
       prisma.about.findUnique({ where: { id: 1 } }),
       prisma.contact.findUnique({ where: { id: 1 } }),
@@ -77,6 +79,8 @@ async function readContentFromDb(): Promise<Content> {
       prisma.project.findMany({ orderBy: { order: "asc" } }),
       prisma.experience.findMany({ orderBy: { order: "asc" } }),
       prisma.skill.findMany({ orderBy: { order: "asc" } }),
+      prisma.service.findMany({ orderBy: { order: "asc" } }),
+      prisma.testimonial.findMany({ orderBy: { order: "asc" } }),
     ]);
 
   return {
@@ -117,6 +121,16 @@ async function readContentFromDb(): Promise<Content> {
       responsibilities: e.responsibilities,
     })),
     skills: skills.map((s) => s.name),
+    services: services.map((s) => ({
+      icon: s.icon,
+      title: s.title,
+      desc: s.desc,
+    })),
+    testimonials: testimonials.map((t) => ({
+      quote: t.quote,
+      author: t.author,
+      role: t.role,
+    })),
   };
 }
 
@@ -132,6 +146,8 @@ export async function saveContent(patch: {
   projects?: ProjectContent[];
   experiences?: ExperienceContent[];
   skills?: string[];
+  services?: ServiceContent[];
+  testimonials?: TestimonialContent[];
 }): Promise<Content> {
   if (patch.about) await upsertAbout(patch.about);
   if (patch.contact) await upsertContact(patch.contact);
@@ -140,6 +156,8 @@ export async function saveContent(patch: {
   if (patch.projects) await syncProjects(patch.projects);
   if (patch.experiences) await syncExperiences(patch.experiences);
   if (patch.skills) await syncSkills(patch.skills);
+  if (patch.services) await syncServices(patch.services);
+  if (patch.testimonials) await syncTestimonials(patch.testimonials);
 
   return getContent();
 }
@@ -273,6 +291,38 @@ async function syncSkills(skills: string[]) {
     if (skills.length) {
       await tx.skill.createMany({
         data: skills.map((name, i) => ({ order: i, name })),
+      });
+    }
+  });
+}
+
+async function syncServices(services: ServiceContent[]) {
+  await prisma.$transaction(async (tx) => {
+    await tx.service.deleteMany();
+    if (services.length) {
+      await tx.service.createMany({
+        data: services.map((s, i) => ({
+          order: i,
+          icon: s.icon,
+          title: s.title,
+          desc: s.desc,
+        })),
+      });
+    }
+  });
+}
+
+async function syncTestimonials(testimonials: TestimonialContent[]) {
+  await prisma.$transaction(async (tx) => {
+    await tx.testimonial.deleteMany();
+    if (testimonials.length) {
+      await tx.testimonial.createMany({
+        data: testimonials.map((t, i) => ({
+          order: i,
+          quote: t.quote,
+          author: t.author,
+          role: t.role,
+        })),
       });
     }
   });

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Muhamed Ahmed Portfolio — Project Documentation</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Calibri, Arial, sans-serif; color: #1f2937; font-size: 11pt; line-height: 1.55; margin: 0; }
+  h1 { font-size: 22pt; color: #1d4ed8; margin: 0 0 4px; }
+  h2 { font-size: 15pt; color: #1d4ed8; border-bottom: 2px solid #dbeafe; padding-bottom: 4px; margin: 28px 0 10px; page-break-after: avoid; }
+  h3 { font-size: 12pt; color: #1e3a8a; margin: 18px 0 6px; page-break-after: avoid; }
+  p { margin: 6px 0; }
+  ul, ol { margin: 6px 0 6px 22px; padding: 0; }
+  li { margin: 3px 0; }
+  code, .mono { font-family: Consolas, "Courier New", monospace; font-size: 9.5pt; background: #f1f5f9; padding: 1px 4px; border-radius: 3px; }
+  pre { font-family: Consolas, "Courier New", monospace; font-size: 9.5pt; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 12px; overflow-x: auto; page-break-inside: avoid; }
+  table { border-collapse: collapse; width: 100%; margin: 8px 0; page-break-inside: avoid; }
+  th, td { border: 1px solid #cbd5e1; padding: 5px 8px; text-align: left; vertical-align: top; font-size: 10pt; }
+  th { background: #eff6ff; color: #1e3a8a; }
+  .cover { text-align: center; padding: 120px 0 0; page-break-after: always; }
+  .cover h1 { font-size: 30pt; }
+  .cover .sub { font-size: 14pt; color: #475569; margin-top: 10px; }
+  .cover .meta { margin-top: 40px; font-size: 11pt; color: #334155; line-height: 1.9; }
+  .badge { display: inline-block; background: #eff6ff; color: #1d4ed8; border-radius: 12px; padding: 2px 10px; font-size: 9pt; margin: 2px; }
+  .note { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 8px 12px; margin: 10px 0; border-radius: 0 6px 6px 0; }
+  .ok { color: #059669; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Muhamed Ahmed Portfolio</h1>
+  <div class="sub">Complete Project Documentation</div>
+  <div class="meta">
+    <span class="badge">Next.js 16</span><span class="badge">React 19</span><span class="badge">TypeScript</span><span class="badge">Prisma 5</span><span class="badge">PostgreSQL</span><span class="badge">Vercel Blob</span><span class="badge">Vercel</span><br><br>
+    Live site: <b>https://muhamed-ahmed-portfolio.vercel.app</b><br>
+    Admin panel: <b>https://muhamed-ahmed-portfolio.vercel.app/admin</b><br>
+    September 2026
+  </div>
+</div>
+
+<h2>1. Project Overview</h2>
+<p>A personal portfolio website for Muhamed Ahmed Shifaw, Software Developer. Originally a static HTML site, it was rebuilt as a modern full-stack application with the same visual design plus a complete admin content-management system.</p>
+<h3>Key capabilities</h3>
+<ul>
+  <li><b>Public portfolio</b> — Home, About, Experience, Projects, Skills, CV, and Contact pages, all rendered from live database content (no code changes or rebuilds needed for content updates).</li>
+  <li><b>Admin dashboard</b> (<code>/admin</code>) — password-protected panel where the owner edits every section of the site: About (including photo upload), Experience, Projects, Skills, CV/Resume (including PDF upload), Contact, and theme colors.</li>
+  <li><b>Database-backed content</b> — every text section lives in PostgreSQL. Public pages read the database on every request, so admin edits appear site-wide instantly.</li>
+  <li><b>File uploads via Vercel Blob</b> — profile photos and CV PDFs upload to Vercel's Blob CDN; the public URL is persisted to the database automatically within the same upload request.</li>
+  <li><b>Theme colors</b> — primary and background colors editable in admin, applied via CSS custom properties.</li>
+  <li><b>Dark/light mode</b> — with a pre-hydration script to avoid flash-of-wrong-theme and React hydration mismatch.</li>
+</ul>
+
+<h2>2. Technology Choices</h2>
+<table>
+  <tr><th>Layer</th><th>Technology</th><th>Why</th></tr>
+  <tr><td>Framework</td><td>Next.js 16, App Router</td><td>Server rendering, co-located API routes, Vercel-native</td></tr>
+  <tr><td>UI</td><td>React 19 + plain CSS</td><td>Ported 1:1 from the original design; no CSS framework dependency</td></tr>
+  <tr><td>Language</td><td>TypeScript 5</td><td>Type safety across content shapes and API contracts</td></tr>
+  <tr><td>ORM</td><td>Prisma 5.22 (pinned)</td><td>Typed DB access; newer majors pull an oversized dependency tree that stalled installs</td></tr>
+  <tr><td>Database</td><td>PostgreSQL (Neon via Vercel Postgres integration)</td><td>Serverless-friendly, auto-injected env vars, pooled connections</td></tr>
+  <tr><td>File storage</td><td>Vercel Blob (<code>@vercel/blob</code>)</td><td>Zero-config CDN-backed uploads, OIDC auth in production</td></tr>
+  <tr><td>Hosting</td><td>Vercel</td><td>Same platform as DB and Blob; instant deploys and preview builds</td></tr>
+</table>
+
+<h2>3. Architecture</h2>
+<h3>3.1 Request flows</h3>
+<pre>Browser
+  ├─ Public pages  ──► Next.js server components ──► lib/db getContent() ──► Postgres
+  └─ /admin        ──► AdminDashboard (client component)
+        ├─ text saves ──► PUT /api/content  (auth-guarded) ──► Postgres
+        └─ uploads    ──► POST /api/upload-profile | /api/upload-cv
+                           ──► Vercel Blob ──► URL persisted to Postgres in the same request</pre>
+<h3>3.2 Directory map</h3>
+<table>
+  <tr><th>Path</th><th>Role</th></tr>
+  <tr><td><code>app/layout.tsx</code></td><td>Root layout; theme init script that runs before hydration</td></tr>
+  <tr><td><code>app/(site)/…</code></td><td>Public pages (home, about, experience, projects, skills, cv, contact) — all <code>force-dynamic</code>, all reading content via <code>lib/db</code></td></tr>
+  <tr><td><code>app/admin/</code></td><td>Admin page + layout (renders AdminDashboard)</td></tr>
+  <tr><td><code>app/api/content/route.ts</code></td><td>GET public read · PUT auth-guarded save (patch semantics)</td></tr>
+  <tr><td><code>app/api/auth/login|logout</code></td><td>Session cookie issue / clear</td></tr>
+  <tr><td><code>app/api/auth/password</code></td><td>PUT — change admin password (verifies current, updates the ADMIN_PASSWORD env var via the Vercel REST API)</td></tr>
+  <tr><td><code>app/api/upload-profile/route.ts</code></td><td>POST — photo → Vercel Blob → URL saved to the About row</td></tr>
+  <tr><td><code>app/api/upload-cv/route.ts</code></td><td>POST — PDF → Vercel Blob → URL saved to the Cv row</td></tr>
+  <tr><td><code>components/AdminDashboard.tsx</code></td><td>The entire admin UI (tabs per section, per-card Save)</td></tr>
+  <tr><td><code>components/Sidebar.tsx</code></td><td>Public sidebar with photo, navigation, theme toggle</td></tr>
+  <tr><td><code>lib/content.ts</code></td><td>TypeScript types + default content (client-safe)</td></tr>
+  <tr><td><code>lib/db.ts</code></td><td>Prisma client (singleton), getContent()/saveContent(), Vercel env fallback chain, DB-down circuit breaker</td></tr>
+  <tr><td><code>lib/auth.ts</code></td><td>HMAC-signed session cookie, 7-day TTL, timing-safe verification</td></tr>
+  <tr><td><code>lib/cv-utils.ts</code></td><td>Client-safe CV merge helpers</td></tr>
+  <tr><td><code>lib/vercel-env.ts</code></td><td>Vercel REST API helper for the password-change flow</td></tr>
+  <tr><td><code>prisma/schema.prisma</code></td><td>10 models (see section 4)</td></tr>
+  <tr><td><code>prisma/migrations/0_init/</code></td><td>Initial SQL migration</td></tr>
+  <tr><td><code>prisma/seed.mjs</code></td><td>Loads data/content.json into Postgres</td></tr>
+  <tr><td><code>data/content.json</code></td><td>Seed source + canonical content shape</td></tr>
+  <tr><td><code>public/</code></td><td>Static assets (original photo/CV still bundled)</td></tr>
+  <tr><td><code>next.config.ts</code></td><td>images.remotePatterns allows <code>*.public.blob.vercel-storage.com</code> so next/image can optimize Blob photos</td></tr>
+</table>
+
+<h2>4. Database Schema (Prisma models)</h2>
+<h3>Single-row sections (fixed id = 1)</h3>
+<table>
+  <tr><th>Model</th><th>Fields</th></tr>
+  <tr><td><code>About</code></td><td>name, title, bio, location, profilePhoto, updatedAt</td></tr>
+  <tr><td><code>Contact</code></td><td>email, phone, github, linkedin, twitter, telegram, updatedAt</td></tr>
+  <tr><td><code>ColorTheme</code></td><td>primary, bg, updatedAt</td></tr>
+  <tr><td><code>Cv</code></td><td>pdfUrl, profile, updatedAt; has many CvStat / CvEducation / CvLanguage</td></tr>
+</table>
+<h3>List sections (ordered; the order field is unique)</h3>
+<table>
+  <tr><th>Model</th><th>Fields</th></tr>
+  <tr><td><code>Project</code></td><td>title, desc, role, tech (string array)</td></tr>
+  <tr><td><code>Experience</code></td><td>title, company, location, date, responsibilities (string array)</td></tr>
+  <tr><td><code>Skill</code></td><td>name</td></tr>
+  <tr><td><code>CvStat</code></td><td>label, number (belongs to Cv)</td></tr>
+  <tr><td><code>CvEducation</code></td><td>degree, institution, date (belongs to Cv)</td></tr>
+  <tr><td><code>CvLanguage</code></td><td>language, level (belongs to Cv)</td></tr>
+</table>
+<p><code>lib/db.ts</code> assembles these rows into the single <code>Content</code> object the UI consumes (<code>getContent()</code>); <code>saveContent(partial)</code> patches only the sections present in the request — list sections sync atomically inside a transaction (delete-missing, upsert-rest). If the database is unreachable, a 30-second circuit breaker serves seeded defaults instead of erroring, keeping the public site online.</p>
+
+<h2>5. Admin Panel Guide</h2>
+<p>Log in at <code>/admin</code> with the <code>ADMIN_PASSWORD</code> value. Sections (left sidebar tabs):</p>
+<ol>
+  <li><b>About Me</b> — name, title, bio, location; Profile Photo widget (Choose File → Upload &amp; Save; uploads to Blob and updates the site immediately; persisting a <code>blob:</code> preview URL is blocked by a guard).</li>
+  <li><b>Experience</b> — job list with add/remove, per-job responsibilities; Save Experience.</li>
+  <li><b>Projects</b> — add/remove/edit projects (title, description, role, tech list); Save Projects.</li>
+  <li><b>Skills</b> — comma-separated skill list; Save Skills.</li>
+  <li><b>CV / Resume</b> — PDF upload (same Blob flow), profile bio, stats, education, languages; Save CV.</li>
+  <li><b>Contact</b> — email, phone, GitHub, LinkedIn, Twitter/X, Telegram; Save Contact.</li>
+  <li><b>Colors</b> — primary and background color pickers; Apply Colors.</li>
+  <li><b>Account &amp; Security</b> — change password (verifies the current password; minimum 8 characters). The new value is stored in the Vercel project's <code>ADMIN_PASSWORD</code> env var via the Vercel REST API; it takes effect on the next deployment because serverless functions snapshot env vars at deploy time.</li>
+</ol>
+<p>All saves go through <code>PUT /api/content</code> (or the upload routes), which requires a valid admin session cookie.</p>
+
+<h2>6. Authentication &amp; Security</h2>
+<ul>
+  <li><b>Session:</b> after login, an HMAC-SHA256–signed token (payload = expiry, 7-day TTL) is set as an <code>httpOnly</code>, <code>sameSite=lax</code>, <code>secure</code>-in-production cookie named <code>admin_session</code>. Verification is timing-safe.</li>
+  <li><b>Secrets:</b> <code>AUTH_SECRET</code> signs tokens; <code>ADMIN_PASSWORD</code> gates login. Production values live in Vercel project settings, never in the repo (<code>.env*</code> is git-ignored).</li>
+  <li><b>Dev defaults:</b> insecure fallbacks (<code>admin123</code>, dev secret) warn loudly but exist only outside production.</li>
+  <li><b>Password change:</b> authenticated-only; verifies the current password before accepting a new one.</li>
+  <li><b>Public API:</b> <code>GET /api/content</code> exposes read-only public data; all writes are session-guarded.</li>
+</ul>
+<div class="note"><b>Known hardening opportunities (not yet implemented):</b> login rate limiting; moving the password into the database as a bcrypt hash so changes take effect instantly.</div>
+
+<h2>7. Environment Variables</h2>
+<table>
+  <tr><th>Variable</th><th>Purpose</th><th>Set where</th></tr>
+  <tr><td><code>DATABASE_URL</code></td><td>Postgres connection (pooled; Prisma adds <code>pgbouncer=true&amp;connection_limit=1</code> automatically)</td><td>Vercel auto-injects (Neon integration); <code>.env.local</code> locally</td></tr>
+  <tr><td><code>POSTGRES_PRISMA_URL</code> / <code>POSTGRES_URL</code></td><td>Fallback chain used by lib/db.ts if DATABASE_URL is absent</td><td>Auto-injected by Vercel</td></tr>
+  <tr><td><code>ADMIN_PASSWORD</code></td><td>Admin login password</td><td>Vercel project env vars</td></tr>
+  <tr><td><code>AUTH_SECRET</code></td><td>Session-cookie signing secret</td><td>Vercel project env vars</td></tr>
+  <tr><td><code>BLOB_STORE_ID</code> + runtime OIDC token</td><td>Blob auth in production (no static token needed)</td><td>Auto-injected by the Blob integration</td></tr>
+  <tr><td><code>BLOB_READ_WRITE_TOKEN</code></td><td>Blob auth alternative for local dev / CLI</td><td>Optional</td></tr>
+  <tr><td><code>VERCEL_TOKEN</code></td><td>Enables in-app password changes via the Vercel REST API</td><td>Hidden project env var</td></tr>
+</table>
+<p>Generate <code>AUTH_SECRET</code>: <code>node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"</code></p>
+
+<h2>8. Production Deployment (current state)</h2>
+<ul>
+  <li><b>Project:</b> <code>muhamed-portfolio</code>, linked via <code>.vercel/project.json</code>.</li>
+  <li><b>Database:</b> Neon Postgres connected through Vercel's Storage integration; <code>DATABASE_URL</code> and <code>POSTGRES_*</code> vars injected automatically for all environments. Initial migration deployed; content seeded from <code>data/content.json</code>.</li>
+  <li><b>Blob store:</b> <code>portfolio-blob</code> (<code>store_Edvho7f7UGv0Sa3X</code>, public access, region iad1), OIDC-connected. Verified end-to-end in production: photo and PDF uploads return Blob URLs that are publicly served and persisted to the database.</li>
+  <li><b>Domain:</b> clean production alias <b>https://muhamed-ahmed-portfolio.vercel.app</b>. Vercel auto-appends the account name to raw deployment URLs; the alias hides it. Deployment protection is disabled because the admin area has its own authentication.</li>
+  <li><b>Images:</b> <code>next.config.ts</code> allows <code>*.public.blob.vercel-storage.com</code> in <code>images.remotePatterns</code> — without this, Next's image optimizer returns 400 for Blob photos and the UI falls back to initials.</li>
+  <li><b>Build:</b> <code>prisma generate &amp;&amp; next build</code>; all DB-reading pages are <code>force-dynamic</code>, so builds never touch the database.</li>
+</ul>
+<p><b>Redeploying:</b> <code>npx vercel --prod</code> (or push to the connected Git repo). After changing the admin password through the panel, redeploy for it to take effect.</p>
+
+<h2>9. Local Development</h2>
+<pre>npm install
+cp .env.example .env.local      # fill in DATABASE_URL, ADMIN_PASSWORD, AUTH_SECRET
+npx prisma migrate deploy       # create tables
+npm run db:seed                 # load starter content from data/content.json
+npm run dev                     # http://localhost:3000  (admin at /admin)</pre>
+<p>Useful commands: <code>npm run db:studio</code> (browse data), <code>npm run db:migrate</code>, <code>npm run db:push</code>, <code>npm run lint</code>, <code>npx tsc --noEmit</code> (typecheck).</p>
+<p>No local Postgres? The site still renders — <code>lib/db.ts</code> falls back to seeded defaults via the circuit breaker; only admin saves require a reachable database.</p>
+
+<h2>10. Verification History (proven working)</h2>
+<ul>
+  <li>Typecheck and production build pass (14 routes).</li>
+  <li>Local end-to-end with a real Postgres: login → save → row change confirmed directly in the database → public page reflects the change.</li>
+  <li>Production: content API serves database data; admin save round-trip verified; Blob photo and CV uploads verified with publicly reachable URLs persisted to the DB; the image optimizer serves Blob images (HTTP 200, image/jpeg); clean domain alias verified.</li>
+</ul>
+
+<h2>11. Suggested Next Steps</h2>
+<ol>
+  <li><b>Database-backed password</b> — store the admin password as a bcrypt hash in Postgres so changes take effect instantly instead of after redeploy.</li>
+  <li><b>Login rate limiting</b> — throttle the login endpoint to block brute-force attempts.</li>
+  <li><b>Custom domain</b> — attach a purchased domain in Vercel project settings.</li>
+  <li><b>Analytics</b> — Vercel Analytics or a lightweight page-view counter.</li>
+  <li><b>Contact form</b> — serverless email delivery (e.g. Resend) instead of mailto links.</li>
+</ol>
+
+</body>
+</html>

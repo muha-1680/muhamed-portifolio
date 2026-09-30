@@ -142,5 +142,54 @@
         }
       ]
     }
-  }
+  },
+  "services": [
+    {
+      "icon": "fas fa-code",
+      "title": "Web Development",
+      "desc": "Custom web applications built with modern technologies for optimal performance and user experience."
+    },
+    {
+      "icon": "fas fa-server",
+      "title": "Backend Systems",
+      "desc": "Robust APIs and server-side systems — from distributed chat to database-driven platforms."
+    },
+    {
+      "icon": "fas fa-network-wired",
+      "title": "Network Design",
+      "desc": "Enterprise network simulation, VLANs, routing and security configuration."
+    },
+    {
+      "icon": "fas fa-database",
+      "title": "Database Engineering",
+      "desc": "Well-structured MySQL and Postgres schemas powering reliable applications."
+    },
+    {
+      "icon": "fas fa-layer-group",
+      "title": "Full-Stack Apps",
+      "desc": "End-to-end delivery: reservation systems, management platforms, real-time tools."
+    },
+    {
+      "icon": "fas fa-tools",
+      "title": "IT Support",
+      "desc": "System maintenance, diagnostics, and preventive care for business infrastructure."
+    }
+  ],
+  "testimonials": [
+    {
+      "quote": "Muhamed delivered our management platform on time and with great attention to detail.",
+      "author": "A. Kebede",
+      "role": "Project Supervisor"
+    },
+    {
+      "quote": "Quick to learn, reliable, and thorough with network maintenance tasks.",
+      "author": "S. Tesfaye",
+      "role": "IT Manager, CBE"
+    },
+    {
+      "quote": "A strong full-stack developer who writes clean, maintainable code.",
+      "author": "J. Mekonnen",
+      "role": "Lecturer"
+    }
+  ]
 }

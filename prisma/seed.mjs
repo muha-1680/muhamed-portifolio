@@ -89,6 +89,20 @@ async function main() {
     });
   }
 
+  if (Array.isArray(c.services)) {
+    await prisma.service.deleteMany();
+    await prisma.service.createMany({
+      data: c.services.map((s, i) => ({ order: i, ...s })),
+    });
+  }
+
+  if (Array.isArray(c.testimonials)) {
+    await prisma.testimonial.deleteMany();
+    await prisma.testimonial.createMany({
+      data: c.testimonials.map((t, i) => ({ order: i, ...t })),
+    });
+  }
+
   if (Array.isArray(c.cv?.stats)) {
     await prisma.cvStat.deleteMany();
     await prisma.cvStat.createMany({

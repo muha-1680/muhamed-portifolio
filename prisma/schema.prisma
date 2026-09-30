@@ -116,3 +116,23 @@ model CvLanguage {
   @@unique([cvId, order])
   @@map("cv_languages")
 }
+
+model Service {
+  id    Int    @id @default(autoincrement())
+  order Int    @unique
+  icon  String
+  title String
+  desc  String
+
+  @@map("services")
+}
+
+model Testimonial {
+  id     Int    @id @default(autoincrement())
+  order  Int    @unique
+  quote  String
+  author String
+  role   String
+
+  @@map("testimonials")
+}

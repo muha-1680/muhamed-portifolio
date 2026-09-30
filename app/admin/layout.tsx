@@ -13,6 +13,8 @@ export default function AdminLayout({
     { href: "/admin#about", label: "About Me", icon: "fa-user" },
     { href: "/admin#experience", label: "Experience", icon: "fa-briefcase" },
     { href: "/admin#projects", label: "Projects", icon: "fa-code" },
+    { href: "/admin#services", label: "Services", icon: "fa-hand-sparkles" },
+    { href: "/admin#testimonials", label: "Testimonials", icon: "fa-quote-right" },
     { href: "/admin#skills", label: "Skills", icon: "fa-cog" },
     { href: "/admin#cv", label: "CV / Resume", icon: "fa-file-pdf" },
     { href: "/admin#contact", label: "Contact", icon: "fa-envelope" },

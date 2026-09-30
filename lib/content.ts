@@ -50,6 +50,16 @@ export interface ColorsContent {
   primary: string;
   bg: string;
 }
+export interface ServiceContent {
+  icon: string;
+  title: string;
+  desc: string;
+}
+export interface TestimonialContent {
+  quote: string;
+  author: string;
+  role: string;
+}
 export interface Content {
   about: AboutContent;
   contact: ContactContent;
@@ -58,6 +68,8 @@ export interface Content {
   projects: ProjectContent[];
   experiences: ExperienceContent[];
   cv: CVContent;
+  services: ServiceContent[];
+  testimonials: TestimonialContent[];
 }
 
 /** Default content — seeded from the original static HTML site. */
@@ -108,8 +120,8 @@ export const defaultContent: Content = {
     },
   },
   colors: {
-    primary: "#2563eb",
-    bg: "#f0f2f5",
+    primary: "#f59e0b",
+    bg: "#160c02",
   },
   projects: [
     {
@@ -151,6 +163,55 @@ export const defaultContent: Content = {
         "Collaborated with IT staff to ensure secure and efficient banking operations.",
         "Followed organizational security procedures and best practices for data protection.",
       ],
+    },
+  ],
+  services: [
+    {
+      icon: "fas fa-code",
+      title: "Web Development",
+      desc: "Custom web applications built with modern technologies for optimal performance and user experience.",
+    },
+    {
+      icon: "fas fa-server",
+      title: "Backend Systems",
+      desc: "Robust APIs and server-side systems — from distributed chat to database-driven platforms.",
+    },
+    {
+      icon: "fas fa-network-wired",
+      title: "Network Design",
+      desc: "Enterprise network simulation, VLANs, routing and security configuration.",
+    },
+    {
+      icon: "fas fa-database",
+      title: "Database Engineering",
+      desc: "Well-structured MySQL and Postgres schemas powering reliable applications.",
+    },
+    {
+      icon: "fas fa-layer-group",
+      title: "Full-Stack Apps",
+      desc: "End-to-end delivery: reservation systems, management platforms, real-time tools.",
+    },
+    {
+      icon: "fas fa-tools",
+      title: "IT Support",
+      desc: "System maintenance, diagnostics, and preventive care for business infrastructure.",
+    },
+  ],
+  testimonials: [
+    {
+      quote: "Muhamed delivered our management platform on time and with great attention to detail.",
+      author: "A. Kebede",
+      role: "Project Supervisor",
+    },
+    {
+      quote: "Quick to learn, reliable, and thorough with network maintenance tasks.",
+      author: "S. Tesfaye",
+      role: "IT Manager, CBE",
+    },
+    {
+      quote: "A strong full-stack developer who writes clean, maintainable code.",
+      author: "J. Mekonnen",
+      role: "Lecturer",
     },
   ],
 };
