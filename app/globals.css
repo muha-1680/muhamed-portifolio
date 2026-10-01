@@ -226,7 +226,9 @@ h2.sec span {
 /* ---------------- Cards / grids ---------------- */
 .grid3 {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* minmax(0, 1fr) lets columns shrink below content width on narrow screens
+     (plain 1fr = minmax(auto, 1fr) causes horizontal overflow) */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 20px;
 }
 .card {
@@ -265,6 +267,143 @@ h2.sec span {
   color: var(--muted);
   font-size: 13.5px;
   line-height: 1.6;
+}
+
+/* ---------------- Skills & Experience ---------------- */
+.se-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+.se-col {
+  min-width: 0;
+}
+.se-title {
+  color: #fff;
+  font-size: 18px;
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(249, 115, 22, 0.2);
+}
+.se-title i {
+  color: var(--primary);
+  margin-right: 8px;
+}
+.se-title-gap {
+  margin-top: 34px;
+}
+.se-empty {
+  color: var(--muted);
+  font-size: 13.5px;
+}
+
+/* Experience timeline */
+.timeline {
+  position: relative;
+  padding-left: 26px;
+}
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  background: linear-gradient(180deg, var(--primary), rgba(249, 115, 22, 0.1));
+}
+.tl-item {
+  position: relative;
+  padding-bottom: 22px;
+}
+.tl-item:last-child {
+  padding-bottom: 0;
+}
+.tl-dot {
+  position: absolute;
+  left: -26px;
+  top: 6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.16);
+}
+.tl-body {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(249, 115, 22, 0.15);
+  border-radius: 14px;
+  padding: 18px 20px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.tl-body:hover {
+  border-color: rgba(249, 115, 22, 0.45);
+  transform: translateY(-2px);
+}
+.tl-date {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: var(--primary-2);
+  background: rgba(249, 115, 22, 0.12);
+  border-radius: 999px;
+  padding: 3px 11px;
+  margin-bottom: 8px;
+}
+.tl-body h4 {
+  color: #fff;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+.tl-meta {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+.tl-meta i {
+  color: var(--primary);
+  margin-right: 6px;
+}
+.tl-list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.65;
+}
+.tl-list li {
+  margin-bottom: 4px;
+}
+.tl-list li::marker {
+  color: var(--primary);
+}
+
+/* Education cards */
+.edu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.edu-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(249, 115, 22, 0.15);
+  border-radius: 14px;
+  padding: 16px 18px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.edu-card:hover {
+  border-color: rgba(249, 115, 22, 0.45);
+  transform: translateY(-2px);
+}
+.edu-card h4 {
+  color: #fff;
+  font-size: 14.5px;
+  margin-bottom: 4px;
+}
+.edu-card p {
+  color: var(--muted);
+  font-size: 13px;
 }
 
 /* ---------------- About ---------------- */
@@ -345,6 +484,10 @@ h2.sec span {
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 6px;
+}
+/* chips inside a card sit under the description text */
+.card-chips {
+  margin-top: 12px;
 }
 .chip {
   border: 1px solid rgba(249, 115, 22, 0.4);
@@ -497,18 +640,21 @@ footer .soc a:hover {
     font-size: 34px;
   }
   .grid3 {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .about-wrap {
     flex-direction: column;
   }
-  .nav-links {
-    display: none;
+  .se-wrap {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .se-title-gap {
+    margin-top: 28px;
   }
 }
 @media (max-width: 600px) {
   .grid3 {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .about-cols {
     grid-template-columns: 1fr;

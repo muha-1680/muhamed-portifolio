@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# freebuff local runtime artifacts (pg data, logs, run docs, mockups)
+.freebuff/
+
 # local runtime artifacts (pg data, logs, run docs)
 .freebuff/pgdata/
 .freebuff/pglog/

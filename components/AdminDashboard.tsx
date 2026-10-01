@@ -233,10 +233,41 @@ export default function AdminDashboard() {
   }
 
   // ---------- photo upload ----------
+  // Vercel serverless functions reject request bodies over ~4.5MB (HTTP 413),
+  // so large photos are downscaled/converted to JPEG in the browser first.
+  async function compressImage(file: File, maxDim = 1200, quality = 0.85): Promise<File> {
+    if (file.type === "image/webp") return file; // keep webp as-is
+    try {
+      const bitmap = await createImageBitmap(file);
+      const scale = Math.min(1, maxDim / Math.max(bitmap.width, bitmap.height));
+      const w = Math.round(bitmap.width * scale);
+      const h = Math.round(bitmap.height * scale);
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return file;
+      ctx.drawImage(bitmap, 0, 0, w, h);
+      const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, "image/jpeg", quality),
+      );
+      if (!blob || blob.size >= file.size) return file; // compression didn't help
+      return new File([blob], file.name.replace(/\.\w+$/, "") + ".jpg", {
+        type: "image/jpeg",
+      });
+    } catch {
+      return file;
+    }
+  }
+
   async function uploadProfilePhoto(file: File) {
     if (!file) return null;
+    const compressed = await compressImage(file);
+    if (compressed.size > 4 * 1024 * 1024) {
+      throw new Error("Image is too large even after compression — please use a smaller photo.");
+    }
     const form = new FormData();
-    form.append("file", file);
+    form.append("file", compressed);
     const res = await fetch("/api/upload-profile", {
       method: "POST",
       body: form,
@@ -255,8 +286,10 @@ export default function AdminDashboard() {
     if (file.type !== "application/pdf") {
       throw new Error("Only PDF files are allowed.");
     }
-    if (file.size > 10 * 1024 * 1024) {
-      throw new Error("PDF must be under 10 MB.");
+    if (file.size > 4 * 1024 * 1024) {
+      throw new Error(
+        "PDF must be under 4 MB (server upload limit). Please compress it first.",
+      );
     }
     const form = new FormData();
     form.append("file", file);

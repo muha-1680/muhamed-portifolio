@@ -167,32 +167,43 @@ export async function saveContent(patch: {
 // ---------------------------------------------------------------------------
 
 async function upsertAbout(next: Partial<AboutContent>) {
+  // Merge with the current row so fields absent from the patch keep their
+  // existing value (falling back to defaults here would wipe saved data,
+  // e.g. an uploaded profilePhoto, whenever another card is saved).
+  const current = await prisma.about.findUnique({ where: { id: 1 } });
+  const base = current ?? defaultContent.about;
   const data = {
-    name: next.name ?? defaultContent.about.name,
-    title: next.title ?? defaultContent.about.title,
-    bio: next.bio ?? defaultContent.about.bio,
-    location: next.location ?? defaultContent.about.location,
-    profilePhoto: next.profilePhoto ?? defaultContent.about.profilePhoto,
+    name: next.name ?? base.name,
+    title: next.title ?? base.title,
+    bio: next.bio ?? base.bio,
+    location: next.location ?? base.location,
+    profilePhoto: next.profilePhoto ?? base.profilePhoto,
   };
   await prisma.about.upsert({ where: { id: 1 }, update: data, create: { id: 1, ...data } });
 }
 
 async function upsertContact(next: Partial<ContactContent>) {
+  // Merge with the current row (see upsertAbout for rationale).
+  const current = await prisma.contact.findUnique({ where: { id: 1 } });
+  const base = current ?? defaultContent.contact;
   const data = {
-    email: next.email ?? defaultContent.contact.email,
-    phone: next.phone ?? defaultContent.contact.phone,
-    github: next.github ?? defaultContent.contact.github,
-    linkedin: next.linkedin ?? defaultContent.contact.linkedin,
-    twitter: next.twitter ?? defaultContent.contact.twitter,
-    telegram: next.telegram ?? defaultContent.contact.telegram,
+    email: next.email ?? base.email,
+    phone: next.phone ?? base.phone,
+    github: next.github ?? base.github,
+    linkedin: next.linkedin ?? base.linkedin,
+    twitter: next.twitter ?? base.twitter,
+    telegram: next.telegram ?? base.telegram,
   };
   await prisma.contact.upsert({ where: { id: 1 }, update: data, create: { id: 1, ...data } });
 }
 
 async function upsertColors(next: Partial<ColorsContent>) {
+  // Merge with the current row (see upsertAbout for rationale).
+  const current = await prisma.colorTheme.findUnique({ where: { id: 1 } });
+  const base = current ?? defaultContent.colors;
   const data = {
-    primary: next.primary ?? defaultContent.colors.primary,
-    bg: next.bg ?? defaultContent.colors.bg,
+    primary: next.primary ?? base.primary,
+    bg: next.bg ?? base.bg,
   };
   await prisma.colorTheme.upsert({ where: { id: 1 }, update: data, create: { id: 1, ...data } });
 }

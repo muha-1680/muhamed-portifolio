@@ -149,29 +149,76 @@ export default async function HomePage() {
         Skills &amp; <span>Experience</span>
       </h2>
       <p className="sec-sub">My technical expertise and professional journey</p>
-      <div className="grid3">
-        {experiences.map((e, i) => (
-          <div className="card" key={`exp-${i}`}>
-            <h3>
-              <i className="fas fa-briefcase"></i> {e.title}
-            </h3>
-            <p>
-              {e.company} · {e.location} · {e.date}
-              <br />
-              {e.responsibilities.slice(0, 3).join(" ")}
-            </p>
-          </div>
-        ))}
-        {cv.education.map((e, i) => (
-          <div className="card" key={`edu-${i}`}>
-            <h3>
-              <i className="fas fa-graduation-cap"></i> {e.degree}
-            </h3>
-            <p>
-              {e.institution} · {e.date}
-            </p>
-          </div>
-        ))}
+      <div className="se-wrap">
+        {/* Experience — timeline, one entry per admin "Experience" item */}
+        <div className="se-col">
+          <h3 className="se-title">
+            <i className="fas fa-briefcase"></i> Experience
+          </h3>
+          {experiences.length === 0 ? (
+            <p className="se-empty">Experience coming soon.</p>
+          ) : (
+            <div className="timeline">
+              {experiences.map((e, i) => (
+                <article className="tl-item" key={`exp-${i}`}>
+                  <span className="tl-dot" aria-hidden="true"></span>
+                  <div className="tl-body">
+                    {e.date && <span className="tl-date">{e.date}</span>}
+                    <h4>{e.title}</h4>
+                    <p className="tl-meta">
+                      <i className="fas fa-building"></i> {e.company}
+                      {e.location ? ` · ${e.location}` : ""}
+                    </p>
+                    {e.responsibilities.length > 0 && (
+                      <ul className="tl-list">
+                        {e.responsibilities.map((r, j) => (
+                          <li key={j}>{r}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Education + skills — same column, compact cards */}
+        <div className="se-col">
+          <h3 className="se-title">
+            <i className="fas fa-graduation-cap"></i> Education
+          </h3>
+          {cv.education.length === 0 ? (
+            <p className="se-empty">Education coming soon.</p>
+          ) : (
+            <div className="edu-list">
+              {cv.education.map((e, i) => (
+                <div className="edu-card" key={`edu-${i}`}>
+                  <h4>{e.degree}</h4>
+                  <p>
+                    {e.institution}
+                    {e.date ? ` · ${e.date}` : ""}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <h3 className="se-title se-title-gap">
+            <i className="fas fa-cog"></i> Technical Skills
+          </h3>
+          {skills.length === 0 ? (
+            <p className="se-empty">Skills coming soon.</p>
+          ) : (
+            <div className="chips">
+              {skills.map((s) => (
+                <span className="chip" key={s}>
+                  {s}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* ================= PROJECTS ================= */}
@@ -186,15 +233,14 @@ export default async function HomePage() {
               <i className="fas fa-folder-open"></i>
             </div>
             <h3>{p.title}</h3>
-            <p>
-              {p.desc}
-              <br />
+            <p>{p.desc}</p>
+            <div className="chips card-chips">
               {p.tech.map((t) => (
                 <span className="chip" key={t}>
                   {t}
                 </span>
               ))}
-            </p>
+            </div>
           </div>
         ))}
       </div>

@@ -23,10 +23,10 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
-    if (file.size > 10 * 1024 * 1024) {
+    if (file.size > 4 * 1024 * 1024) {
       return NextResponse.json(
-        { error: "PDF must be under 10 MB" },
-        { status: 400 },
+        { error: "PDF must be under 4 MB (server upload limit)" },
+        { status: 413 },
       );
     }
 
