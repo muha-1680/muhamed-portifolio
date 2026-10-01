@@ -23,6 +23,19 @@ export default function Navbar({
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  useEffect(() => {
     const ids = LINKS.map((l) => l.href.slice(1));
     const observer = new IntersectionObserver(
       (entries) => {
@@ -45,6 +58,10 @@ export default function Navbar({
         {firstName}
         <span>.</span>
       </a>
+      <div
+        className={`nav-backdrop ${open ? "show" : ""}`}
+        onClick={() => setOpen(false)}
+      />
       <div className="nav-links">
         {LINKS.map((l) => (
           <a
@@ -56,8 +73,11 @@ export default function Navbar({
             {l.label}
           </a>
         ))}
+        <a href="#contact" className="nav-cta drawer-cta" onClick={() => setOpen(false)}>
+          Let&apos;s Talk
+        </a>
       </div>
-      <a href="#contact" className="nav-cta" onClick={() => setOpen(false)}>
+      <a href="#contact" className="nav-cta desktop-cta" onClick={() => setOpen(false)}>
         Let&apos;s Talk
       </a>
       <Image
