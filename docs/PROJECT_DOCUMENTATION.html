@@ -36,7 +36,7 @@
     <span class="badge">Next.js 16</span><span class="badge">React 19</span><span class="badge">TypeScript</span><span class="badge">Prisma 5</span><span class="badge">PostgreSQL</span><span class="badge">Vercel Blob</span><span class="badge">Vercel</span><br><br>
     Live site: <b>https://muhamed-ahmed-portfolio.vercel.app</b><br>
     Admin panel: <b>https://muhamed-ahmed-portfolio.vercel.app/admin</b><br>
-    September 2026
+    October 2026
   </div>
 </div>
 
@@ -44,7 +44,7 @@
 <p>A personal portfolio website for Muhamed Ahmed Shifaw, Software Developer. Originally a static HTML site, it was rebuilt as a modern full-stack application with the same visual design plus a complete admin content-management system.</p>
 <h3>Key capabilities</h3>
 <ul>
-  <li><b>Public portfolio</b> — Home, About, Experience, Projects, Skills, CV, and Contact pages, all rendered from live database content (no code changes or rebuilds needed for content updates).</li>
+  <li><b>Public portfolio</b> — a single-page site (hero, services, about, skills &amp; experience, projects, testimonials, contact) with sticky navbar; legacy /about, /projects etc. routes redirect to their hash sections. All content renders from the live database (no code changes or rebuilds needed for content updates).</li>
   <li><b>Admin dashboard</b> (<code>/admin</code>) — password-protected panel where the owner edits every section of the site: About (including photo upload), Experience, Projects, Skills, CV/Resume (including PDF upload), Contact, and theme colors.</li>
   <li><b>Database-backed content</b> — every text section lives in PostgreSQL. Public pages read the database on every request, so admin edits appear site-wide instantly.</li>
   <li><b>File uploads via Vercel Blob</b> — profile photos and CV PDFs upload to Vercel's Blob CDN; the public URL is persisted to the database automatically within the same upload request.</li>
@@ -76,7 +76,7 @@
 <table>
   <tr><th>Path</th><th>Role</th></tr>
   <tr><td><code>app/layout.tsx</code></td><td>Root layout; theme init script that runs before hydration</td></tr>
-  <tr><td><code>app/(site)/…</code></td><td>Public pages (home, about, experience, projects, skills, cv, contact) — all <code>force-dynamic</code>, all reading content via <code>lib/db</code></td></tr>
+  <tr><td><code>app/(site)/page.tsx</code></td><td>The single-page public site — all <code>force-dynamic</code>, reading content via <code>lib/db</code>; sub-routes (about, projects, …) now redirect to hash anchors</td></tr>
   <tr><td><code>app/admin/</code></td><td>Admin page + layout (renders AdminDashboard)</td></tr>
   <tr><td><code>app/api/content/route.ts</code></td><td>GET public read · PUT auth-guarded save (patch semantics)</td></tr>
   <tr><td><code>app/api/auth/login|logout</code></td><td>Session cookie issue / clear</td></tr>
@@ -84,7 +84,7 @@
   <tr><td><code>app/api/upload-profile/route.ts</code></td><td>POST — photo → Vercel Blob → URL saved to the About row</td></tr>
   <tr><td><code>app/api/upload-cv/route.ts</code></td><td>POST — PDF → Vercel Blob → URL saved to the Cv row</td></tr>
   <tr><td><code>components/AdminDashboard.tsx</code></td><td>The entire admin UI (tabs per section, per-card Save)</td></tr>
-  <tr><td><code>components/Sidebar.tsx</code></td><td>Public sidebar with photo, navigation, theme toggle</td></tr>
+  <tr><td><code>components/Navbar.tsx</code></td><td>Sticky navbar; on mobile becomes a right-hand slide-in drawer (backdrop, Escape-to-close, body scroll lock)</td></tr>
   <tr><td><code>lib/content.ts</code></td><td>TypeScript types + default content (client-safe)</td></tr>
   <tr><td><code>lib/db.ts</code></td><td>Prisma client (singleton), getContent()/saveContent(), Vercel env fallback chain, DB-down circuit breaker</td></tr>
   <tr><td><code>lib/auth.ts</code></td><td>HMAC-signed session cookie, 7-day TTL, timing-safe verification</td></tr>
@@ -183,7 +183,16 @@ npm run dev                     # http://localhost:3000  (admin at /admin)</pre>
   <li>Production: content API serves database data; admin save round-trip verified; Blob photo and CV uploads verified with publicly reachable URLs persisted to the DB; the image optimizer serves Blob images (HTTP 200, image/jpeg); clean domain alias verified.</li>
 </ul>
 
-<h2>11. Suggested Next Steps</h2>
+<h2>11. Recent Improvements (September–October 2026)</h2>
+<ul>
+  <li><b>Mobile navigation drawer</b> — the mobile menu is a right-hand slide-in drawer (max 78vw/320px) with dimmed backdrop, staggered link animation, Escape-to-close, and body scroll lock. The &quot;Let&apos;s Talk&quot; CTA lives inside the drawer on mobile.</li>
+  <li><b>Photo upload 413 fix</b> — images are compressed client-side in the admin (downscale to 1200px, JPEG quality 0.85) before upload, so large photos no longer exceed Vercel&apos;s ~4.5MB request-body limit. Verified 85MB → 0.2MB.</li>
+  <li><b>Photo-wipe bug fixed</b> — <code>lib/db.ts</code> upserts (About/Contact/Colors) now merge with the current DB row instead of falling back to defaults, so saving an unrelated section no longer wipes the profile photo or other fields.</li>
+  <li><b>Skills &amp; Experience redesign</b> — two-column layout: experience timeline (date dots + bullet lists) beside an education card and skill chips; stacks vertically below 900px; all admin-editable.</li>
+  <li><b>Mobile overflow fixes</b> — grid columns use <code>minmax(0,1fr)</code>; project tech chips moved into a flex container to prevent unbreakable word overflow at 390px.</li>
+  <li><b>CV upload limit</b> — 4MB cap enforced client- and server-side with a clear message (HTTP 413).</li>
+</ul>
+<h2>12. Suggested Next Steps</h2>
 <ol>
   <li><b>Database-backed password</b> — store the admin password as a bcrypt hash in Postgres so changes take effect instantly instead of after redeploy.</li>
   <li><b>Login rate limiting</b> — throttle the login endpoint to block brute-force attempts.</li>

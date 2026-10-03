@@ -136,8 +136,18 @@ export default function AdminDashboard() {
 
   function setProjectField(
     index: number,
-    field: "title" | "desc" | "role" | "tech",
+    field: "title" | "desc" | "role",
     value: string,
+  ): void;
+  function setProjectField(
+    index: number,
+    field: "tech",
+    value: string[],
+  ): void;
+  function setProjectField(
+    index: number,
+    field: "title" | "desc" | "role" | "tech",
+    value: string | string[],
   ) {
     setContent((prev) => {
       if (!prev) return prev;
@@ -150,8 +160,23 @@ export default function AdminDashboard() {
 
   function setExperienceField(
     index: number,
-    field: "title" | "company" | "location" | "date" | "responsibilities",
+    field: "title" | "company" | "location" | "date",
     value: string,
+  ): void;
+  function setExperienceField(
+    index: number,
+    field: "responsibilities",
+    value: string[],
+  ): void;
+  function setExperienceField(
+    index: number,
+    field:
+      | "title"
+      | "company"
+      | "location"
+      | "date"
+      | "responsibilities",
+    value: string | string[],
   ) {
     setContent((prev) => {
       if (!prev) return prev;
@@ -560,16 +585,10 @@ export default function AdminDashboard() {
                     }
                   />
                 </div>
-                <textarea
+                <ListTextarea
                   placeholder="Responsibilities (one per line)"
-                  value={exp.responsibilities.join("\n")}
-                  onChange={(e) =>
-                    setExperienceField(
-                      i,
-                      "responsibilities",
-                      e.target.value,
-                    )
-                  }
+                  value={exp.responsibilities}
+                  onChange={(v) => setExperienceField(i, "responsibilities", v)}
                 />
               </div>
             ))
@@ -672,13 +691,9 @@ export default function AdminDashboard() {
                     setProjectField(i, "role", e.target.value)
                   }
                 />
-                <input
-                  type="text"
-                  placeholder="Technologies (comma separated)"
-                  value={project.tech.join(", ")}
-                  onChange={(e) =>
-                    setProjectField(i, "tech", e.target.value)
-                  }
+                <TechInput
+                  value={project.tech}
+                  onChange={(v) => setProjectField(i, "tech", v)}
                 />
               </div>
             ))
@@ -1434,6 +1449,93 @@ export default function AdminDashboard() {
         </div>
       )}
     </>
+  );
+}
+
+/**
+ * Multi-line textarea whose value is a string[] (one item per line).
+ * Local text state while typing; defensive against legacy string values.
+ */
+function ListTextarea({
+  value,
+  placeholder,
+  onChange,
+}: {
+  value: string[] | string;
+  placeholder: string;
+  onChange: (items: string[]) => void;
+}) {
+  const toText = (v: string[] | string) =>
+    Array.isArray(v) ? v.join("\n") : v;
+
+  const [text, setText] = useState(toText(value));
+
+  useEffect(() => {
+    setText(toText(value));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [Array.isArray(value) ? value.join("\n") : value]);
+
+  return (
+    <textarea
+      placeholder={placeholder}
+      value={text}
+      onChange={(e) => {
+        const v = e.target.value;
+        setText(v);
+        onChange(
+          v
+            .split("\n")
+            .map((s) => s.trim())
+            .filter(Boolean),
+        );
+      }}
+    />
+  );
+}
+
+/**
+ * Technologies input for a project.
+ *
+ * Keeps the raw comma-separated text in local state while typing (so typing a
+ * comma or partial word never crashes) and only converts to the string array
+ * when the text is valid. Handles a legacy string value defensively so a bad
+ * stored shape cannot crash the render.
+ */
+function TechInput({
+  value,
+  onChange,
+}: {
+  value: string[] | string;
+  onChange: (tech: string[]) => void;
+}) {
+  const toText = (v: string[] | string) =>
+    Array.isArray(v) ? v.join(", ") : v;
+
+  const [text, setText] = useState(toText(value));
+
+  // Re-sync if the incoming array changes from outside (e.g. after a save
+  // re-fetch or adding a new project).
+  useEffect(() => {
+    setText(toText(value));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [Array.isArray(value) ? value.join(",") : value]);
+
+  return (
+    <input
+      type="text"
+      placeholder="Technologies (comma separated)"
+      value={text}
+      onChange={(e) => {
+        const v = e.target.value;
+        setText(v);
+        onChange(
+          v
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean),
+        );
+      }}
+    />
   );
 }
 
